@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hello World SCO</title>
+  <script src="pipwerks_scorm.js"></script>
+  <style>
+    body { font-family: sans-serif; background: #1C2333; color: #fff; padding: 48px; }
+    button { padding: 12px 24px; font-size: 16px; margin-top: 20px; cursor: pointer; background: #1A9AFA; color: #fff; border: none; }
+    .status { margin-top: 16px; color: #B4BCD0; }
+  </style>
+</head>
+<body>
+  <h1>Hello World SCO</h1>
+  <p>Minimal SCORM 1.2 package used to verify manifest + packaging against SCORM Cloud.</p>
+  <div class="status">Status: <span id="status">(loading)</span></div>
+  <button id="finishBtn">Finish and exit</button>
+
+  <script>
+    const scorm = pipwerks.SCORM;
+    scorm.version = "1.2";
+
+    window.addEventListener("load", () => {
+      const ok = scorm.init();
+      document.getElementById("status").textContent = ok ? "initialized (LMS detected)" : "standalone (no LMS)";
+      if (ok) {
+        scorm.set("cmi.core.lesson_status", "completed");
+        scorm.save();
+      }
+    });
+
+    document.getElementById("finishBtn").addEventListener("click", () => {
+      if (scorm.connection.isActive) scorm.quit();
+      try { window.close(); } catch (e) {}
+    });
+  </script>
+</body>
+</html>
