@@ -64,32 +64,13 @@ html, body {
   position: relative;
   display: flex;
   flex-direction: column;
-  overflow: hidden;               /* clip anything that overflows the slide frame */
+  justify-content: center;        /* whole content block vertically centered */
+  overflow: hidden;               /* hard clip — anything past 720px is gone */
 }
 
-/* Layout body regions fill remaining vertical space and scroll internally
-   if their content is taller than what the slide frame allows. This keeps
-   every slide at exactly 16:9 — overflow becomes a scroll box, not a taller slide. */
-.layout-l01 .body,
-.layout-l03 .grid,
-.layout-l12 .bars,
-.layout-l13 .objectives,
-.layout-l14 .takeaways,
-.layout-l09 .options {
-  flex: 1;
-  min-height: 0;                  /* required so flex items can shrink below content */
-  overflow-y: auto;
-  padding-right: var(--space-sm); /* a little room for the scrollbar */
-}
-
-/* Nice thin scrollbars instead of the default chunky ones */
-.slide *::-webkit-scrollbar { width: 8px; }
-.slide *::-webkit-scrollbar-track { background: transparent; }
-.slide *::-webkit-scrollbar-thumb {
-  background: rgba(26, 35, 50, 0.15);
-  border-radius: 4px;
-}
-.slide *::-webkit-scrollbar-thumb:hover { background: rgba(26, 35, 50, 0.3); }
+/* NO scrolling inside slides. If content doesn't fit 16:9, the designer needs
+   to split it into another slide — not add a scroll box. Elements sit at their
+   natural height and the whole group is centered vertically in the slide frame. */
 
 h1 {
   font-size: var(--font-size-h1);
@@ -200,28 +181,12 @@ ul.bullets li::before {
 .layout-l09 .submit-btn:hover:not(:disabled) { background: var(--brand-blue-dark); }
 .layout-l09 .submit-btn:disabled { background: var(--text-muted); cursor: not-allowed; box-shadow: none; }
 
-/* L09 submitted — feedback panel fills slide height; quiz + feedback each
-   scroll internally if they overflow. The .slide is already display:flex. */
+/* L09 submitted — natural heights, both columns top-aligned, no stretching */
 .layout-l09.submitted .l09-split {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: var(--space-lg);
-  align-items: stretch;   /* both columns the same height */
-  flex: 1;                /* fill the slide vertically */
-  min-height: 0;          /* allow the grid to shrink below content */
-}
-/* Left column (quiz) scrolls internally if its content is long */
-.layout-l09.submitted .l09-split > div {
-  overflow-y: auto;
-  min-height: 0;
-  padding-right: var(--space-sm);
-}
-/* When L09 is submitted, the options list inside the left column should NOT
-   double-scroll — the wrapper is already scrollable, so the list flows naturally. */
-.layout-l09.submitted .options {
-  flex: initial;
-  overflow: visible;
-  padding-right: 0;
+  align-items: start;
 }
 .layout-l09 .feedback-panel {
   background: var(--bg-secondary);
@@ -229,14 +194,6 @@ ul.bullets li::before {
   padding: var(--space-lg);
   box-shadow: var(--shadow-md);
   border: 2px solid var(--brand-blue);
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;       /* scroll internally if feedback text is very long */
-  min-height: 0;
-}
-.layout-l09 .feedback-panel .submit-btn {
-  margin-top: auto;       /* pin "Continue" to the bottom of the panel */
-  align-self: flex-start;
 }
 .layout-l09 .feedback-panel.correct { border-color: var(--feedback-correct); background: rgba(16, 185, 129, 0.04); }
 .layout-l09 .feedback-panel.incorrect { border-color: var(--feedback-incorrect); background: rgba(239, 68, 68, 0.04); }
