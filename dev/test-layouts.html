@@ -2,21 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Layout test harness</title>
-  <link rel="stylesheet" href="../shell/css/theme-dark.css">
-  <link rel="stylesheet" href="../shell/css/layouts.css">
+  <title>Layout test harness — 3 theme options</title>
+
+  <!-- Google Fonts for all three themes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Theme stylesheet — swapped by dropdown -->
+  <link id="theme-css" rel="stylesheet" href="../shell/css/themes/theme-a-executive.css">
+
   <style>
-    body { padding: 40px 0; }
+    body { padding: 40px 0 120px; }
     .test-section { margin-bottom: 80px; }
     .test-section h2.label {
       color: var(--brand-blue);
       max-width: var(--slide-width);
       margin: 0 auto var(--space-sm);
       padding: 0 var(--slide-padding);
+      font-family: "Inter", -apple-system, sans-serif;
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      opacity: 0.75;
     }
+
+    /* Contain popup inside its slide for the test harness (real shell lets it cover the viewport). */
+    #test-l12-popup .layout-l12 .popup-backdrop {
+      position: absolute;
+      inset: 0;
+    }
+
+    /* Sticky theme switcher — scaffolding, not part of any theme */
+    .theme-switcher {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      background: rgba(10, 12, 20, 0.92);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      font-size: 14px;
+      z-index: 500;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .theme-switcher strong { display: block; margin-bottom: 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: #B4BCD0; }
+    .theme-switcher select {
+      font-size: 14px;
+      padding: 6px 10px;
+      background: #1C2333;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .theme-switcher .hint { display: block; margin-top: 6px; font-size: 11px; color: #7A8299; max-width: 180px; }
   </style>
 </head>
 <body>
+  <div class="theme-switcher">
+    <strong>Theme</strong>
+    <select id="theme-select">
+      <option value="theme-a-executive">A — Executive Brief</option>
+      <option value="theme-b-airy">B — Airy Modern</option>
+      <option value="theme-c-cinematic">C — Cinematic Editorial</option>
+    </select>
+    <span class="hint" id="theme-hint"></span>
+  </div>
+
   <section class="test-section">
     <h2 class="label">L01 — Text only</h2>
     <div id="test-l01"></div>
@@ -53,5 +109,22 @@
   </section>
 
   <script src="test-layouts.js"></script>
+  <script>
+    // Theme switcher
+    const themeHints = {
+      "theme-a-executive": "Deep navy + gold + serif. McKinsey / HBR / EY thought leadership feel.",
+      "theme-b-airy": "Light mode + rounded + soft shadows. Notion / Linear / Articulate Rising Star feel.",
+      "theme-c-cinematic": "Dark gradient + glass cards + giant serif numbers. Masterclass / CNN longform feel."
+    };
+    const sel = document.getElementById("theme-select");
+    const hint = document.getElementById("theme-hint");
+    const link = document.getElementById("theme-css");
+    function applyTheme(name) {
+      link.href = `../shell/css/themes/${name}.css`;
+      hint.textContent = themeHints[name] || "";
+    }
+    sel.addEventListener("change", e => applyTheme(e.target.value));
+    applyTheme(sel.value);
+  </script>
 </body>
 </html>
