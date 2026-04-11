@@ -173,11 +173,16 @@ ul.bullets li::before {
 .layout-l09 .submit-btn:hover:not(:disabled) { background: var(--brand-blue-dark); }
 .layout-l09 .submit-btn:disabled { background: var(--text-muted); cursor: not-allowed; box-shadow: none; }
 
+.layout-l09.submitted {
+  display: flex;
+  flex-direction: column;
+}
 .layout-l09.submitted .l09-split {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: var(--space-lg);
-  align-items: start;
+  align-items: stretch;   /* both columns match the tallest = full height */
+  flex: 1;                /* fill all remaining vertical space in the slide */
 }
 .layout-l09 .feedback-panel {
   background: var(--bg-secondary);
@@ -185,6 +190,12 @@ ul.bullets li::before {
   padding: var(--space-lg);
   box-shadow: var(--shadow-md);
   border: 2px solid var(--brand-blue);
+  display: flex;
+  flex-direction: column;
+}
+.layout-l09 .feedback-panel .submit-btn {
+  margin-top: auto;      /* pin "Continue" to the bottom of the panel */
+  align-self: flex-start;
 }
 .layout-l09 .feedback-panel.correct { border-color: var(--feedback-correct); background: rgba(16, 185, 129, 0.04); }
 .layout-l09 .feedback-panel.incorrect { border-color: var(--feedback-incorrect); background: rgba(239, 68, 68, 0.04); }
