@@ -1,0 +1,108 @@
+{
+  "module": {
+    "id": "sample",
+    "title": "Shell runtime test",
+    "module_label": "Sample",
+    "scorm_identifier": "com.qianhui.sample"
+  },
+  "slides": [
+    {
+      "id": "01-objectives",
+      "layout": "L13",
+      "title": "What you will be able to do",
+      "objectives": [
+        "Differentiate a procurement plan from a project plan",
+        "Select a packaging strategy for given constraints"
+      ]
+    },
+    {
+      "id": "02-intro",
+      "layout": "L01",
+      "title": "Why this matters",
+      "body": [
+        "Procurement shapes cost, risk, and timing across the whole project.",
+        "- Sets the commercial framework for every vendor relationship",
+        "- Locks in risk allocation before any vendor is chosen",
+        "- Determines delivery leverage for the life of the project"
+      ]
+    },
+    {
+      "id": "03-what-is",
+      "layout": "L03",
+      "title": "What is a procurement plan",
+      "media": { "placeholder": "photo of signed contract on desk" },
+      "bullets": [
+        "A document that defines how purchases will be managed",
+        "Covers vendor selection, contract type, and delivery timing",
+        "Lives across the project lifecycle"
+      ]
+    },
+    {
+      "id": "04-menu",
+      "layout": "L12",
+      "title": "Explore the plan components",
+      "bars": [
+        { "num": "01", "title": "Objectives and criteria", "popup_slide_id": "04p-objectives" },
+        { "num": "02", "title": "Scope and packaging", "popup_slide_id": "04p-scope" },
+        { "num": "03", "title": "Contract type", "popup_slide_id": "04p-contract" }
+      ]
+    },
+    {
+      "id": "04p-objectives",
+      "layout": "popup",
+      "title": "Objectives and criteria",
+      "body": [
+        "- Clear measurable targets aligned to sponsor expectations",
+        "- Weighted evaluation criteria",
+        "- Agreed acceptance thresholds"
+      ],
+      "key_message": "Tie every criterion to a sponsor-owned success measure."
+    },
+    {
+      "id": "04p-scope",
+      "layout": "popup",
+      "title": "Scope and packaging",
+      "body": [
+        "- Decide single-package vs multi-package procurement",
+        "- Balance integration risk against vendor leverage"
+      ]
+    },
+    {
+      "id": "04p-contract",
+      "layout": "popup",
+      "title": "Contract type",
+      "body": [
+        "- Fixed-price: risk sits with the vendor, less flexibility",
+        "- Time-and-materials: flexibility, risk on the buyer",
+        "- Hybrid: capped T&M, shared risk"
+      ],
+      "key_message": "Contract type is the single biggest risk-allocation lever in the plan."
+    },
+    {
+      "id": "05-check",
+      "layout": "L09",
+      "title": "Knowledge check",
+      "stem": "Which of these belongs in a procurement plan, not a project plan?",
+      "options": [
+        "Sprint cadence and ceremonies",
+        "Stakeholder communication schedule",
+        "Contract type (fixed-price vs T&M)",
+        "Risk register ownership"
+      ],
+      "correct_index": 2,
+      "feedback_correct": "Contract type is a core procurement-plan decision — it shapes risk allocation and payment structure.",
+      "feedback_incorrect": "That option is a general project-management concern. Contract type (option 3) is the procurement answer.",
+      "points": 100
+    },
+    {
+      "id": "06-summary",
+      "layout": "L14",
+      "title": "Key takeaways",
+      "takeaways": [
+        "A procurement plan answers 'how will we buy?' — distinct from the project plan",
+        "Packaging and contract type allocate risk before any vendor is involved",
+        "Every criterion should trace back to a sponsor-owned success measure"
+      ]
+    }
+  ]
+}
