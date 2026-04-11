@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Layout test harness</title>
+  <link rel="stylesheet" href="../shell/css/theme-dark.css">
+  <link rel="stylesheet" href="../shell/css/layouts.css">
+  <style>
+    body { padding: 40px 0; }
+    .test-section { margin-bottom: 80px; }
+    .test-section h2.label {
+      color: var(--brand-blue);
+      max-width: var(--slide-width);
+      margin: 0 auto var(--space-sm);
+      padding: 0 var(--slide-padding);
+    }
+  </style>
+</head>
+<body>
+  <section class="test-section">
+    <h2 class="label">L01 — Text only</h2>
+    <div id="test-l01"></div>
+  </section>
+
+  <section class="test-section">
+    <h2 class="label">L03 — 60/40 media + text</h2>
+    <div id="test-l03"></div>
+  </section>
+
+  <section class="test-section">
+    <h2 class="label">L09 — MCQ (default / selected / correct / incorrect)</h2>
+    <div id="test-l09-default"></div>
+    <div id="test-l09-selected"></div>
+    <div id="test-l09-correct"></div>
+    <div id="test-l09-incorrect"></div>
+  </section>
+
+  <section class="test-section">
+    <h2 class="label">L12 — Menu hub (fresh / midway / popup open)</h2>
+    <div id="test-l12-fresh"></div>
+    <div id="test-l12-midway"></div>
+    <div id="test-l12-popup"></div>
+  </section>
+
+  <section class="test-section">
+    <h2 class="label">L13 — Objectives</h2>
+    <div id="test-l13"></div>
+  </section>
+
+  <section class="test-section">
+    <h2 class="label">L14 — Summary</h2>
+    <div id="test-l14"></div>
+  </section>
+
+  <script src="test-layouts.js"></script>
+</body>
+</html>
