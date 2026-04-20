@@ -138,6 +138,14 @@ renderL12("test-l12-fresh", [], null);
 renderL12("test-l12-midway", [0, 2, 5], null);
 renderL12("test-l12-popup", [0, 2], 0);
 
+// Wire up × close in the test harness so you can actually click-close the demo popup.
+document.querySelectorAll("#test-l12-popup .popup-close").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const slide = btn.closest(".layout-l12");
+    if (slide) slide.classList.remove("popup-open");
+  });
+});
+
 // L13
 document.getElementById("test-l13").innerHTML = `
   <div class="slide layout-l13">
