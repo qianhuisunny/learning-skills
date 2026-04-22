@@ -1,0 +1,228 @@
+{
+  "module": {
+    "id": "2.5-procurement-plan",
+    "title": "Developing the procurement plan",
+    "module_label": "Module 2.5",
+    "scorm_identifier": "com.qianhui.m2-5-procurement-plan"
+  },
+  "slides": [
+    {
+      "id": "01-objectives",
+      "layout": "L13",
+      "title": "What you will be able to do",
+      "objectives": [
+        "Differentiate a procurement plan from a project plan by scope and purpose",
+        "Identify the 8 components of a procurement plan and their role",
+        "Select the appropriate contract type given project constraints"
+      ]
+    },
+    {
+      "id": "02-activate",
+      "layout": "L01",
+      "title": "You already use a project plan",
+      "body": [
+        "Before we talk about procurement plans, let's anchor to something familiar.",
+        "- A project plan covers scope, timeline, resources, and deliverables",
+        "- It answers: what are we building, and when?",
+        "- Every PM creates one — it's the backbone of project execution"
+      ]
+    },
+    {
+      "id": "03-what-is",
+      "layout": "L03",
+      "title": "What is a procurement plan",
+      "media": {
+        "placeholder": "Diagram: procurement plan as a parallel document feeding into the project plan"
+      },
+      "bullets": [
+        "Defines how purchases will be managed across the project",
+        "Covers vendor selection, contract type, and delivery timing",
+        "Lives alongside the project plan — not inside it"
+      ]
+    },
+    {
+      "id": "04-contrast",
+      "layout": "L01",
+      "title": "Project plan vs procurement plan",
+      "body": [
+        "Two documents, two questions, one project.",
+        "- Project plan asks: WHAT are we building and WHEN?",
+        "- Procurement plan asks: HOW do we buy and FROM WHOM?",
+        "- Project plan owns scope and schedule — procurement plan owns commercial strategy"
+      ]
+    },
+    {
+      "id": "05-framework",
+      "layout": "L01",
+      "title": "Three phases of a procurement plan",
+      "body": [
+        "Before we explore all eight components, here's how they organize.",
+        "- Define — what to buy (objectives, scope, method)",
+        "- Execute — how to buy (contract type, evaluation, risk)",
+        "- Govern — who decides (schedule, governance, approvals)"
+      ]
+    },
+    {
+      "id": "06-menu",
+      "layout": "L12",
+      "title": "Explore each component",
+      "bars": [
+        {
+          "num": "01",
+          "title": "Objectives and criteria",
+          "popup_slide_id": "06p-objectives"
+        },
+        {
+          "num": "02",
+          "title": "Scope and packaging",
+          "popup_slide_id": "06p-scope"
+        },
+        {
+          "num": "03",
+          "title": "Procurement method",
+          "popup_slide_id": "06p-method"
+        },
+        {
+          "num": "04",
+          "title": "Contract type",
+          "popup_slide_id": "06p-contract"
+        },
+        {
+          "num": "05",
+          "title": "Evaluation approach",
+          "popup_slide_id": "06p-evaluation"
+        },
+        {
+          "num": "06",
+          "title": "Risk and contingency",
+          "popup_slide_id": "06p-risk"
+        },
+        {
+          "num": "07",
+          "title": "Schedule and milestones",
+          "popup_slide_id": "06p-schedule"
+        },
+        {
+          "num": "08",
+          "title": "Governance and approvals",
+          "popup_slide_id": "06p-governance"
+        }
+      ]
+    },
+    {
+      "id": "06p-contract",
+      "layout": "popup",
+      "title": "Contract type",
+      "body": [
+        "- Fixed-price: risk sits with the vendor, less flexibility for changes",
+        "- Time-and-materials: flexibility for the buyer, risk on cost overruns",
+        "- Hybrid (capped T&M): shared risk, caps protect the buyer"
+      ],
+      "key_message": "Contract type is the single biggest risk-allocation lever in the plan."
+    },
+    {
+      "id": "06p-evaluation",
+      "layout": "popup",
+      "title": "Evaluation approach",
+      "body": [
+        "- Technical merit: does the solution meet requirements?",
+        "- Price competitiveness: is the cost reasonable for the market?",
+        "- Risk profile: what could go wrong with this vendor?",
+        "- Past performance: has this vendor delivered similar work?"
+      ],
+      "key_message": "Weight criteria before you see proposals — not after."
+    },
+    {
+      "id": "06p-governance",
+      "layout": "popup",
+      "title": "Governance and approvals",
+      "body": [
+        "- Define approval authority levels (who signs what value)",
+        "- Establish the evaluation panel composition",
+        "- Set escalation path for disputes and variations"
+      ],
+      "key_message": "Clear governance prevents the 'who approved this?' conversation six months in."
+    },
+    {
+      "id": "06p-method",
+      "layout": "popup",
+      "title": "Procurement method",
+      "body": [
+        "- Open tender: maximum competition, higher admin effort",
+        "- Restricted tender: pre-qualified shortlist, faster",
+        "- Direct appointment: speed, but must justify sole-source"
+      ],
+      "key_message": "Match the method to the market — don't default to open tender for every package."
+    },
+    {
+      "id": "06p-objectives",
+      "layout": "popup",
+      "title": "Objectives and criteria",
+      "body": [
+        "- Clear measurable targets aligned to sponsor expectations",
+        "- Evaluation criteria weighted by strategic priority",
+        "- Acceptance thresholds agreed with the steering group"
+      ],
+      "key_message": "Tie every criterion back to a sponsor-owned success measure."
+    },
+    {
+      "id": "06p-risk",
+      "layout": "popup",
+      "title": "Risk and contingency",
+      "body": [
+        "- Identify procurement-specific risks (vendor insolvency, supply chain disruption)",
+        "- Assign risk to the party best positioned to manage it",
+        "- Build contingency into timeline and budget — not just cost"
+      ],
+      "key_message": "Risk allocation happens in the contract — if it's not written down, you own it."
+    },
+    {
+      "id": "06p-schedule",
+      "layout": "popup",
+      "title": "Schedule and milestones",
+      "body": [
+        "- Map procurement timeline to project critical path",
+        "- Build in lead times for tender, evaluation, and mobilization",
+        "- Identify dependencies between packages"
+      ],
+      "key_message": "Procurement delay is the #1 cause of project schedule slip in complex programs."
+    },
+    {
+      "id": "06p-scope",
+      "layout": "popup",
+      "title": "Scope and packaging",
+      "body": [
+        "- Decide single-package vs multi-package procurement",
+        "- Balance integration risk against vendor leverage",
+        "- Map each package to a delivery milestone"
+      ],
+      "key_message": "Packaging is your first risk allocation decision — get it right before vendors are involved."
+    },
+    {
+      "id": "07-mcq",
+      "layout": "L09",
+      "title": "Knowledge check",
+      "stem": "You're managing a construction project with a well-defined scope, a fixed deadline, and an experienced vendor pool. Which contract type best fits this situation?",
+      "options": [
+        "Time-and-materials — maximum flexibility for scope changes",
+        "Fixed-price — risk transferred to vendor, scope is locked",
+        "Capped T&M — shared risk with a cost ceiling",
+        "Cost-plus — vendor reimbursed for all costs plus a fee"
+      ],
+      "correct_index": 1,
+      "feedback_correct": "Fixed-price is the right choice. The scope is well-defined and the deadline is fixed — scope changes are unlikely, so transferring delivery risk to the vendor makes sense.",
+      "feedback_incorrect": "With a well-defined scope and fixed deadline, fixed-price is the strongest fit. T&M gives flexibility you don't need here, and cost-plus removes the vendor's incentive to control costs.",
+      "points": 100
+    },
+    {
+      "id": "08-summary",
+      "layout": "L14",
+      "title": "Key takeaways",
+      "takeaways": [
+        "A procurement plan answers 'how will we buy?' — distinct from the project plan's 'what and when?'",
+        "Eight components group into three phases: Define, Execute, Govern",
+        "Contract type is the biggest risk-allocation lever — match it to scope certainty and timeline pressure"
+      ]
+    }
+  ]
+}

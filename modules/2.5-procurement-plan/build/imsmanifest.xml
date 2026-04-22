@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="com.qianhui.m2-5-procurement-plan" version="1.0"
+          xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+          xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd
+                              http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd
+                              http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>1.2</schemaversion>
+  </metadata>
+  <organizations default="DEFAULT_ORG">
+    <organization identifier="DEFAULT_ORG">
+      <title>Developing the procurement plan</title>
+      <item identifier="ITEM_01" identifierref="RES_01" isvisible="true">
+        <title>Developing the procurement plan</title>
+      </item>
+    </organization>
+  </organizations>
+  <resources>
+    <resource identifier="RES_01" type="webcontent" adlcp:scormtype="sco" href="index.html">
+      <file href="content.json"/>
+      <file href="css/layouts.css"/>
+      <file href="css/nav.css"/>
+      <file href="css/theme-dark.css"/>
+      <file href="css/themes/theme-a-executive.css"/>
+      <file href="css/themes/theme-b-airy.css"/>
+      <file href="css/themes/theme-c-cinematic.css"/>
+      <file href="index.html"/>
+      <file href="js/app.js"/>
+      <file href="js/pipwerks_scorm.js"/>
+      <file href="schemas/README.md"/>
+    </resource>
+  </resources>
+</manifest>

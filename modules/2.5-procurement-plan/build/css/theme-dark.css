@@ -1,0 +1,81 @@
+/* EY-Parthenon dark theme — shared across all modules */
+:root {
+  --bg-primary: #1C2333;
+  --bg-secondary: #252D42;
+  --bg-elevated: #2E384F;
+  --brand-blue: #1A9AFA;
+  --brand-blue-dim: #1578C4;
+  --text-primary: #FFFFFF;
+  --text-secondary: #B4BCD0;
+  --text-muted: #7A8299;
+  --accent-yellow: #FFC83D;
+  --feedback-correct: #2ECC71;
+  --feedback-incorrect: #E74C3C;
+
+  --space-xs: 6px;
+  --space-sm: 12px;
+  --space-md: 20px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+
+  --font-sans: "Helvetica Neue", "Arial", sans-serif;
+  --font-size-body: 18px;
+  --font-size-h1: 42px;
+  --font-size-h2: 28px;
+  --font-size-h3: 22px;
+  --line-height-body: 1.5;
+
+  --slide-width: 1280px;
+  --slide-height: 720px;
+  --slide-padding: 64px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  min-height: 100vh;
+}
+
+.slide {
+  width: var(--slide-width);
+  min-height: var(--slide-height);
+  padding: var(--slide-padding);
+  margin: 0 auto;
+  background: var(--bg-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+h1 { font-size: var(--font-size-h1); font-weight: 700; margin-bottom: var(--space-md); }
+h2 { font-size: var(--font-size-h2); font-weight: 600; margin-bottom: var(--space-sm); }
+h3 { font-size: var(--font-size-h3); font-weight: 600; margin-bottom: var(--space-sm); }
+p  { margin-bottom: var(--space-md); }
+
+.module-label {
+  display: inline-block;
+  padding-left: var(--space-sm);
+  border-left: 4px solid var(--brand-blue);
+  color: var(--text-secondary);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-md);
+}
+
+ul.bullets { list-style: none; padding: 0; }
+ul.bullets li {
+  padding-left: var(--space-md);
+  margin-bottom: var(--space-sm);
+  position: relative;
+}
+ul.bullets li::before {
+  content: "–";
+  position: absolute;
+  left: 0;
+  color: var(--brand-blue);
+}

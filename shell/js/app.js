@@ -95,13 +95,15 @@
     app.appendChild(renderByLayout(slide));
 
     const visible = visibleSlides();
-    document.getElementById("progress").textContent =
-      `Slide ${state.currentIdx + 1} of ${visible.length}`;
+    const progress = document.getElementById("progress");
+    progress.innerHTML = `Page <span class="current">${state.currentIdx + 1}</span>/${visible.length}`;
     document.getElementById("btn-prev").disabled = state.currentIdx === 0;
 
     const nextBtn = document.getElementById("btn-next");
     nextBtn.disabled = !canAdvance();
-    nextBtn.textContent = state.currentIdx === visible.length - 1 ? "Finish" : "Next";
+    const isLast = state.currentIdx === visible.length - 1;
+    nextBtn.innerHTML = isLast ? "Finish" : "&#8594;";
+    nextBtn.classList.toggle("finish", isLast);
 
     if (slide.layout === "L14" && !state.completed) {
       markComplete();
@@ -356,7 +358,7 @@
         onExit();
       }
     });
-    document.getElementById("btn-exit").addEventListener("click", onExit);
+    // Exit button removed — top-bar back arrow + Next/Finish handle all navigation
   }
 
   // ---------- SCORM ----------
