@@ -104,11 +104,12 @@ html, body {
 .slide {
   max-width: 1100px;
   margin: 0 auto;
-  padding: calc(56px + var(--space-2xl)) var(--space-xl) var(--space-2xl);
-  min-height: 100vh;
+  padding: calc(56px + var(--space-lg)) var(--space-xl) var(--space-lg);
+  height: 100vh;              /* exactly one screen — no scrolling */
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow: hidden;           /* clip anything that overflows */
 }
 
 h1 { font-size: var(--font-size-h1); font-weight: 800; margin-bottom: var(--space-md); line-height: 1.15; letter-spacing: -0.03em; }
@@ -168,7 +169,7 @@ ul.bullets li::before {
 }
 .layout-l09 .options { list-style: none; padding: 0; max-width: 640px; }
 .layout-l09 .options li {
-  padding: var(--space-md) var(--space-lg); margin-bottom: var(--space-sm);
+  padding: 14px var(--space-lg); margin-bottom: 10px;
   background: var(--bg-primary); border: 2px solid var(--bg-elevated);
   border-radius: var(--radius-md); cursor: pointer;
   transition: all 180ms; font-weight: 500;
@@ -187,44 +188,67 @@ ul.bullets li::before {
 .layout-l09 .submit-btn:hover:not(:disabled) { background: var(--brand-green-dark); }
 .layout-l09 .submit-btn:disabled { background: var(--text-muted); cursor: not-allowed; }
 
+/* L09 submitted: feedback stacks BELOW quiz, page can scroll */
+.layout-l09.submitted {
+  height: auto;            /* override 100vh — allow scroll for feedback */
+  min-height: 100vh;
+  overflow-y: auto;
+  justify-content: flex-start;
+  padding-bottom: var(--space-2xl);
+}
 .layout-l09.submitted .l09-split {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: var(--space-2xl); align-items: start;
+  display: flex;
+  flex-direction: column;  /* stack vertically, not side-by-side */
+  gap: var(--space-xl);
 }
 .layout-l09 .feedback-panel {
   background: var(--bg-secondary);
   border-radius: var(--radius-lg);
   padding: var(--space-xl);
-  border-left: 4px solid var(--brand-green);
+  border-top: 4px solid var(--brand-green);
+  max-width: 640px;
 }
-.layout-l09 .feedback-panel.correct { border-left-color: var(--feedback-correct); }
-.layout-l09 .feedback-panel.incorrect { border-left-color: var(--feedback-incorrect); }
-.layout-l09 .feedback-panel h3 { color: var(--brand-green); font-size: 24px; }
+.layout-l09 .feedback-panel.correct { border-top-color: var(--feedback-correct); }
+.layout-l09 .feedback-panel.incorrect { border-top-color: var(--feedback-incorrect); }
+.layout-l09 .feedback-panel h3 {
+  color: var(--brand-green);
+  font-size: 24px;
+  text-align: center;
+}
+.layout-l09 .feedback-panel h3::after {
+  content: "✓";
+  display: block;
+  font-size: 36px;
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
 .layout-l09 .feedback-panel.correct h3 { color: var(--feedback-correct); }
+.layout-l09 .feedback-panel.correct h3::after { content: "✓"; }
 .layout-l09 .feedback-panel.incorrect h3 { color: var(--feedback-incorrect); }
+.layout-l09 .feedback-panel.incorrect h3::after { content: "✕"; }
 .layout-l09 .feedback-panel p { max-width: none; }
 
 /* ========== L12 — Menu hub ========== */
 .layout-l12 .bars {
   list-style: none; padding: 0;
   display: grid; grid-template-columns: 1fr 1fr;
-  gap: var(--space-md); margin-top: var(--space-xl); max-width: 900px;
+  gap: 12px; margin-top: var(--space-lg); max-width: 900px;
 }
 .layout-l12 .bar {
-  display: flex; align-items: center; gap: var(--space-md);
-  padding: var(--space-lg);
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: 18px 22px;
   background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 200ms;
   border: 2px solid transparent;
 }
 .layout-l12 .bar:hover { border-color: var(--brand-green-light); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .layout-l12 .bar .num {
-  width: 48px; height: 48px; border-radius: 50%;
+  width: 40px; height: 40px; border-radius: 50%;
   background: var(--brand-green-light); color: var(--brand-green);
   display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 18px; flex-shrink: 0;
+  font-weight: 800; font-size: 16px; flex-shrink: 0;
 }
 .layout-l12 .bar .title-text { color: var(--text-primary); font-weight: 600; font-size: 16px; }
 .layout-l12 .bar .check {
