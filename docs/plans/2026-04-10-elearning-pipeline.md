@@ -1,5 +1,13 @@
 # eLearning Pipeline MVP Implementation Plan
 
+> **Status note (updated):** This original plan described a three-skill flow that
+> mixed storyboarding into `/build-html`. The current repo contract is now the
+> four-skill flow in `README.md` and
+> `docs/specs/2026-04-10-elearning-pipeline-design.md`:
+> `/content-map` → `/storyboard` → `/build-html` → `/scorm-pack`.
+> Treat the detailed tasks below as historical implementation notes unless they
+> have been updated to match that four-skill boundary.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Build a three-skill Claude Code pipeline (`/content-map` → `/build-html` → `/scorm-pack`) that transforms a lesson brief into a SCORM 1.2 package, and pilot it end-to-end with Module 2.5 uploaded to SCORM Cloud.

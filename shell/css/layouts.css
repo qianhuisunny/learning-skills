@@ -1,6 +1,28 @@
 /* ========== L01 — Text only ========== */
 .layout-l01 .body { max-width: 960px; margin-top: var(--space-md); }
 
+/* ========== L02 — Hero + body ========== */
+.layout-l02 .hero {
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  background: var(--bg-secondary);
+  border-left: 6px solid var(--brand-blue);
+  color: var(--text-secondary);
+  font-size: var(--font-size-h3);
+}
+.layout-l02 .body { max-width: 900px; }
+.layout-l02 .cta {
+  margin-top: var(--space-lg);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--brand-blue);
+  color: #fff;
+  border: none;
+  font-size: var(--font-size-body);
+}
+
 /* ========== L03 — 60/40 media + text ========== */
 .layout-l03 .grid {
   display: grid;
@@ -19,6 +41,114 @@
   color: var(--text-muted);
   text-align: center;
   padding: var(--space-md);
+}
+
+/* ========== L04 — Text + media right ========== */
+.layout-l04 .grid {
+  display: grid;
+  grid-template-columns: 40% 60%;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  align-items: start;
+}
+.layout-l04 .media {
+  background: var(--bg-secondary);
+  border: 1px dashed var(--text-muted);
+  min-height: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  text-align: center;
+  padding: var(--space-md);
+}
+
+/* ========== L05 — 3-up cards ========== */
+.layout-l05 .cards {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+.layout-l05 .card {
+  background: var(--bg-secondary);
+  border-top: 4px solid var(--brand-blue);
+  padding: var(--space-lg);
+  min-height: 180px;
+}
+.layout-l05 .card .icon {
+  display: block;
+  color: var(--brand-blue);
+  font-size: var(--font-size-h2);
+  margin-bottom: var(--space-sm);
+}
+.layout-l05 .card h2 { font-size: var(--font-size-h3); }
+
+/* ========== L06 — Compare 2-up ========== */
+.layout-l06 .compare {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+  margin-top: var(--space-lg);
+}
+.layout-l06 .compare-col {
+  background: var(--bg-secondary);
+  border-left: 4px solid var(--brand-blue);
+  padding: var(--space-lg);
+}
+
+/* ========== L07 — Stepper ========== */
+.layout-l07 .steps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  counter-reset: step;
+}
+.layout-l07 .step {
+  position: relative;
+  background: var(--bg-secondary);
+  padding: var(--space-lg);
+  border-top: 4px solid var(--brand-blue);
+}
+.layout-l07 .step .num {
+  display: inline-flex;
+  width: 42px;
+  height: 42px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-sm);
+  background: var(--brand-blue);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* ========== L08 — Timeline ========== */
+.layout-l08 .timeline {
+  list-style: none;
+  padding: 0 0 0 var(--space-lg);
+  margin-top: var(--space-lg);
+  border-left: 3px solid var(--brand-blue);
+}
+.layout-l08 .node {
+  position: relative;
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-secondary);
+}
+.layout-l08 .node::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * var(--space-lg) - 8px);
+  top: var(--space-lg);
+  width: 14px;
+  height: 14px;
+  background: var(--brand-blue);
+  border-radius: 50%;
 }
 
 /* ========== L09 — MCQ ========== */
@@ -68,6 +198,70 @@
 .layout-l09 .feedback-panel h3 { color: var(--brand-blue); }
 .layout-l09 .feedback-panel.correct h3 { color: var(--feedback-correct); }
 .layout-l09 .feedback-panel.incorrect h3 { color: var(--feedback-incorrect); }
+
+/* ========== L10 — Scenario choice ========== */
+.layout-l10 .context {
+  max-width: 960px;
+  padding: var(--space-lg);
+  margin: var(--space-md) 0 var(--space-lg);
+  background: var(--bg-secondary);
+  border-left: 4px solid var(--brand-blue);
+  font-size: var(--font-size-h3);
+}
+.layout-l10 .choices {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-md);
+}
+.layout-l10 .choices li {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-secondary);
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+.layout-l10 .choices li:hover,
+.layout-l10 .choices li.selected { border-color: var(--brand-blue); background: var(--bg-elevated); }
+.layout-l10 .choices li.correct-answer { border-color: var(--feedback-correct); }
+.layout-l10 .choices li.disabled { pointer-events: none; opacity: 0.8; }
+
+/* ========== L11 — Drag/match ========== */
+.layout-l11 .instruction {
+  max-width: 960px;
+  margin: var(--space-md) 0;
+  font-size: var(--font-size-h3);
+}
+.layout-l11 .matches {
+  list-style: none;
+  padding: 0;
+  max-width: 960px;
+}
+.layout-l11 .match-row {
+  display: grid;
+  grid-template-columns: 1fr 260px 90px;
+  gap: var(--space-md);
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-sm);
+  background: var(--bg-secondary);
+}
+.layout-l11 select {
+  padding: var(--space-sm);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--text-muted);
+}
+.layout-l11 .result.correct { color: var(--feedback-correct); }
+.layout-l11 .result.incorrect { color: var(--feedback-incorrect); }
+.layout-l11 .submit-btn {
+  margin-top: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--brand-blue);
+  color: #fff;
+  border: none;
+}
+.layout-l11 .submit-btn:disabled { background: var(--text-muted); }
 
 /* ========== L12 — Menu hub (vertical bars + popup overlay) ========== */
 .layout-l12 .bars { list-style: none; padding: 0; max-width: 960px; margin-top: var(--space-md); }

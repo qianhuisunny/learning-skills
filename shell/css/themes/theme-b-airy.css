@@ -228,38 +228,63 @@ ul.bullets li::before {
 .layout-l09 .feedback-panel.incorrect h3::after { content: "✕"; }
 .layout-l09 .feedback-panel p { max-width: none; }
 
-/* ========== L12 — Menu hub ========== */
+/* ========== L12 — Menu hub (horizontal timeline) ========== */
 .layout-l12 .bars {
-  list-style: none; padding: 0;
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 12px; margin-top: var(--space-lg); max-width: 900px;
+  list-style: none; padding: 0 20px;
+  display: flex; flex-direction: row;
+  align-items: flex-start; justify-content: space-between;
+  position: relative;
+  margin-top: var(--space-xl);
+}
+.layout-l12 .bars::before {
+  content: '';
+  position: absolute;
+  top: 19px;
+  left: 48px; right: 48px;
+  height: 2px;
+  background: var(--brand-blue);
+  opacity: 0.25;
 }
 .layout-l12 .bar {
-  display: flex; align-items: center; gap: var(--space-sm);
-  padding: 18px 22px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
+  display: flex; flex-direction: column; align-items: center;
+  background: none; border: none;
   cursor: pointer;
+  position: relative;
+  flex: 1;
+  padding: 0 4px;
   transition: all 200ms;
-  border: 2px solid transparent;
 }
-.layout-l12 .bar:hover { border-color: var(--brand-green-light); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.layout-l12 .bar:hover .num {
+  background: var(--brand-blue); color: #fff;
+  border-color: var(--brand-blue);
+  transform: scale(1.15);
+  box-shadow: 0 0 16px rgba(26,154,250,0.35);
+}
+.layout-l12 .bar:hover .title-text { color: var(--text-primary); }
 .layout-l12 .bar .num {
   width: 40px; height: 40px; border-radius: 50%;
-  background: var(--brand-green-light); color: var(--brand-green);
+  background: var(--bg-secondary);
+  border: 2px solid var(--brand-blue); color: var(--brand-blue);
   display: flex; align-items: center; justify-content: center;
-  font-weight: 800; font-size: 16px; flex-shrink: 0;
+  font-weight: 800; font-size: 14px; flex-shrink: 0;
+  position: relative; z-index: 1;
+  transition: all 200ms;
 }
-.layout-l12 .bar .title-text { color: var(--text-primary); font-weight: 600; font-size: 16px; }
+.layout-l12 .bar .title-text {
+  color: var(--text-secondary); font-weight: 500; font-size: 13px;
+  text-align: center; margin-top: var(--space-sm); line-height: 1.35;
+}
 .layout-l12 .bar .check {
-  width: 28px; height: 28px; border-radius: 50%;
+  width: 18px; height: 18px; border-radius: 50%;
   background: var(--feedback-correct); color: #fff;
   display: none; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 14px; margin-left: auto; flex-shrink: 0;
+  font-weight: 700; font-size: 10px;
+  position: absolute; top: -3px; left: calc(50% + 6px); z-index: 2;
 }
 .layout-l12 .bar.visited .check { display: flex; }
-.layout-l12 .bar.visited { background: var(--bg-primary); border-color: var(--bg-elevated); }
-.layout-l12 .bar.visited .num { background: var(--bg-elevated); color: var(--text-muted); }
+.layout-l12 .bar.visited .num {
+  background: var(--feedback-correct); border-color: var(--feedback-correct); color: #fff;
+}
 
 /* Popup overlay */
 .layout-l12 .popup-backdrop {
@@ -283,7 +308,7 @@ ul.bullets li::before {
 }
 .layout-l12 .popup-header .num {
   width: 40px; height: 40px; border-radius: 50%;
-  background: var(--brand-green-light); color: var(--brand-green);
+  background: var(--bg-elevated); color: var(--brand-blue);
   display: flex; align-items: center; justify-content: center;
   font-weight: 800; font-size: 16px; flex-shrink: 0;
 }
@@ -301,8 +326,9 @@ ul.bullets li::before {
 .layout-l12 .popup-key-message {
   margin-top: var(--space-lg);
   padding: var(--space-md) var(--space-lg);
-  background: var(--brand-green-light); border-radius: var(--radius-md);
-  color: var(--brand-green-dark); font-weight: 600; font-size: 15px; line-height: 1.5;
+  border-left: 4px solid var(--accent-yellow);
+  background: rgba(255, 200, 61, 0.08); border-radius: var(--radius-md);
+  color: var(--accent-yellow); font-weight: 600; font-size: 15px; line-height: 1.5;
 }
 
 /* ========== L13 — Objectives ========== */

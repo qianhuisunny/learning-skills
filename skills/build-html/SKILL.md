@@ -1,82 +1,120 @@
 ---
 name: build-html
-description: Use after /storyboard — transforms per-slide markdown files into a runnable HTML module using the shared shell. Two phases with a review gate between them. Third skill in the eLearning pipeline.
+description: Use after /storyboard approval — implements the approved storyboard as a runnable HTML eLearning module using the shared shell. Third skill in the eLearning pipeline.
 ---
 
 # /build-html
 
 ## Overview
 
-Two-phase skill:
-- **Phase 1 (storyboard → slide files):** Read the storyboard output, produce one markdown file per slide in `content/`, present a summary table. STOP for review.
-- **Phase 2 (build step):** Merge `content/*.md` + copy shell → produce runnable `build/index.html`. STOP for review.
+Builds the production HTML module from an approved storyboard. This skill owns
+implementation: translating storyboard screens into `content/*.md`, copying the
+shared shell, merging `content.json`, and preparing a browser-reviewable build.
+
+It does **not** redesign the instructional flow, create a new storyboard, or
+package the module as SCORM. If the storyboard is insufficient, stop and ask for
+G2 storyboard fixes before building.
+
+Important: storyboard and runtime use the same canonical layout registry. This
+skill verifies that the shell can render each approved canonical layout and
+closes runtime gaps when needed.
 
 ## When to use
 
-- User invokes `/build-html` after the storyboard has been reviewed
-- User says "build the slides" / "generate the HTML" / "continue"
+- User invokes `/build-html` after G2 storyboard approval
+- User says "build the HTML", "implement the storyboard", or "make the module runnable"
 
 ## Input
 
-- `modules/<slug>/content-map.md` (from `/content-map`)
-- Storyboard output (from `/storyboard` — PPT or markdown storyboard)
-- Optional: supplementary reference material
+Required:
+- `modules/<slug>/storyboard/storyboard.md` or `storyboard.json`
+- `modules/<slug>/module.yml` or enough metadata to create it
 
-## Phase 1 — Slide files
+Optional:
+- `modules/<slug>/storyboard/prototype/` as visual reference only
+- `modules/<slug>/storyboard.pptx` as stakeholder-review reference
 
-1. Read the storyboard. For each slide decide:
-   - Which layout: L01, L03, L09, L12, L13, L14, or popup
-   - What content goes in each field (per `shell/content.schema.md`)
-2. Write `modules/<slug>/module.yml`:
+## Output
+
+```text
+modules/<slug>/
+  module.yml
+  content/
+    NN-slug.md
+  build/
+    index.html
+    content.json
+    css/
+    js/
+    assets/
+```
+
+Do not write `dist/` and do not create a SCORM zip. That belongs to
+`/scorm-pack`.
+
+## Workflow
+
+1. **Read the approved storyboard.** Treat it as the source of truth.
+2. **Check build readiness.** Confirm every screen has an ID, title, canonical
+   `layout`, type, on-screen content, interaction notes, and required build data.
+3. **Write `module.yml`** if missing:
    ```yaml
-   id: 2.5-procurement-plan
-   title: Developing the procurement plan
-   module_label: Module 2.5
-   scorm_identifier: com.qianhui.m2-5-procurement-plan
+   id: <module-slug>
+   title: <module title>
+   module_label: <module label>
+   scorm_identifier: <reverse-domain.identifier>
    ```
-3. Write one `modules/<slug>/content/NN-slug.md` per slide with YAML frontmatter.
-4. Present summary table (slide #, file, title, layout, type, notes).
-5. **STOP for G2 review.** User verifies slide count, layouts, order, content. User can hand-edit files or describe changes in natural language.
-6. On approval:
+4. **Verify runtime coverage.** Use `docs/reference/layout-contract.md` and
+   `shell/content.schema.md`. If the shell cannot render an approved canonical
+   layout, extend the schema/renderer/CSS or stop for a user-approved temporary
+   adaptation.
+5. **Write one `content/*.md` file per production screen** using YAML
+   frontmatter that matches `shell/content.schema.md`.
+6. **Preserve interaction wiring.** Popups use `layout: popup` and are
+   referenced by `popup_slide_id` from L12 bars. Assessment screens include
+   correct answers, feedback, and points.
+7. **Run the HTML build script:**
    ```bash
-   cd ~/Desktop/elearning-skills && git add modules/<slug>/content/ modules/<slug>/module.yml && git commit -m "G2: content files approved for <slug>"
+   python3 ~/Desktop/elearning-skills/scripts/build_html.py ~/Desktop/elearning-skills/modules/<slug>
    ```
-
-## Phase 2 — Build step
-
-1. Run the pack script (which copies shell + merges content + fills manifest + zips):
+8. **Start a local server for browser review:**
    ```bash
-   python3 ~/Desktop/elearning-skills/scripts/pack_scorm.py ~/Desktop/elearning-skills/modules/<slug>
+   cd ~/Desktop/elearning-skills/modules/<slug>/build && python3 -m http.server 8765
    ```
-   This populates `build/` as a side effect. For a build-only check (no zip needed yet), you can stop here and browse `build/`.
-2. Start a local server:
-   ```bash
-   cd ~/Desktop/elearning-skills/modules/<slug>/build && python3 -m http.server 8765 &
-   ```
-3. Tell user: "Open http://localhost:8765/ and walk through the module."
-4. **STOP for G3 review.** User walks through. Route feedback by layer:
-   - **Content fix** ("slide 4 title should be X") → edit `content/*.md`, re-run build.
-   - **Shell visual fix** ("all popup borders too thin") → edit `shell/css/themes/theme-b-airy.css`, warn user it affects all modules, re-run build.
-   - **Shell behavior fix** ("checkmark doesn't show") → edit `shell/js/app.js`, re-run build.
-5. On approval:
-   ```bash
-   pkill -f "http.server 8765" || true
-   cd ~/Desktop/elearning-skills && git add modules/<slug>/build/ shell/ && git commit -m "G3: browser walkthrough passed for <slug>"
-   ```
+9. **Tell the user to review** `http://localhost:8765/`.
+10. **Route G3 feedback by layer:**
+   - Content mismatch -> edit `content/*.md`, rerun build.
+   - Storyboard mismatch -> return to `/storyboard`.
+   - Missing runtime layout -> extend the shell, or ask for explicit approval
+     before using a temporary adaptation.
+   - Shell visual issue -> edit `shell/css/...`, warn user it affects all modules.
+   - Shell behavior issue -> edit `shell/js/app.js`, warn user it affects all modules.
+11. **On G3 approval**, git auto-commit:
+    ```bash
+    cd ~/Desktop/elearning-skills && git add modules/<slug>/module.yml modules/<slug>/content/ modules/<slug>/build/ shell/ && git commit -m "G3: HTML build approved for <slug>"
+    ```
 
 ## Rules
 
-1. Phase 1 and 2 are separate — STOP for G2 in between.
-2. Use only MVP layouts: L01, L03, L09, L12, L13, L14, popup. Push back on deferred layouts.
-3. Slide filenames: `NN-slug.md`, zero-padded prefix for ordering.
-4. Popups use `layout: popup`, referenced by `popup_slide_id` from L12 bars.
-5. Respect `shell/content.schema.md`.
-6. **Slides must fit 16:9 (1280×720). No scrolling.** If content overflows, split into more slides.
-7. Route user feedback to the right layer — don't make the user pick files.
-8. On shell-level changes, warn the user that the change affects all modules.
+1. Build from the approved storyboard; do not invent a new screen flow.
+2. Production slide files live in `content/*.md`; storyboard artifacts stay in
+   `storyboard/`.
+3. Use only fields supported by `shell/content.schema.md`.
+4. Production `layout` values must use the canonical registry in
+   `docs/reference/layout-contract.md`.
+5. Slides must fit the 16:9 shell. If content overflows, return to storyboard or
+   split the production content only when the split is faithful to the approved
+   storyboard.
+6. Popups and assessments must preserve all states described in the storyboard.
+7. If the storyboard requires an unsupported runtime component, default to
+   extending the shell. Temporary adaptation requires explicit approval and an
+   `adapted_from` note.
+8. Do not call `pack_scorm.py`; use `build_html.py` for HTML builds.
 9. Do not auto-trigger `/scorm-pack`.
 
-## Reference files
+## Reference Files
 
-- `shell/content.schema.md` — JSON field shapes per layout
-- `docs/reference/elearning_available_components_and_layouts_3.md` — full layout spec
+- `shell/content.schema.md`
+- `docs/reference/layout-contract.md` — authoritative layout registry
+- `scripts/build_html.py`
+- `scripts/merge_content.py`

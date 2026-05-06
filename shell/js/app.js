@@ -9,6 +9,8 @@
     content: null,
     currentIdx: 0,
     mcqState: {},   // slide_id → { selectedIdx, submitted, isCorrect }
+    scenarioState: {}, // slide_id → { selectedIdx, submitted, isCorrect }
+    matchState: {}, // slide_id → { selections: string[], submitted, isCorrect }
     menuState: {},  // slide_id → { visited: Set<number>, openBar: number|null }
     scormActive: false,
     totalScore: 0,
@@ -35,7 +37,7 @@
     document.title = state.content.module.title;
 
     state.maxScore = state.content.slides
-      .filter(s => s.layout === "L09")
+      .filter(s => ["L09", "L10", "L11"].includes(s.layout))
       .reduce((sum, s) => sum + (s.points != null ? s.points : 25), 0);
 
     state.scormActive = scorm.init();
@@ -116,6 +118,14 @@
       const mcq = state.mcqState[slide.id];
       return !!(mcq && mcq.submitted);
     }
+    if (slide.layout === "L10") {
+      const scenario = state.scenarioState[slide.id];
+      return !!(scenario && scenario.submitted);
+    }
+    if (slide.layout === "L11") {
+      const match = state.matchState[slide.id];
+      return !!(match && match.submitted);
+    }
     if (slide.layout === "L12") {
       const menu = state.menuState[slide.id] || { visited: new Set() };
       return menu.visited.size >= slide.bars.length;
@@ -131,8 +141,16 @@
   function renderByLayout(slide) {
     switch (slide.layout) {
       case "L01": return renderL01(slide);
+      case "L02": return renderL02(slide);
       case "L03": return renderL03(slide);
+      case "L04": return renderL04(slide);
+      case "L05": return renderL05(slide);
+      case "L06": return renderL06(slide);
+      case "L07": return renderL07(slide);
+      case "L08": return renderL08(slide);
       case "L09": return renderL09(slide);
+      case "L10": return renderL10(slide);
+      case "L11": return renderL11(slide);
       case "L12": return renderL12(slide);
       case "L13": return renderL13(slide);
       case "L14": return renderL14(slide);
@@ -161,14 +179,116 @@
     const el = document.createElement("div");
     el.className = "slide layout-l03";
     const media = slide.media || { placeholder: "media placeholder" };
+    const heading = slide.heading ? `<h2>${esc(slide.heading)}</h2>` : "";
     const bullets = (slide.bullets || []).map(b => `<li>${esc(b)}</li>`).join("");
     el.innerHTML = `
       ${moduleLabelHtml()}
       <h1>${esc(slide.title)}</h1>
       <div class="grid">
         <div class="media">{{MEDIA_1}}<br>${esc(media.placeholder)}</div>
-        <div class="text"><ul class="bullets">${bullets}</ul></div>
+        <div class="text">${heading}<ul class="bullets">${bullets}</ul></div>
       </div>
+    `;
+    return el;
+  }
+
+  function renderL02(slide) {
+    const el = document.createElement("div");
+    el.className = "slide layout-l02";
+    const cta = slide.cta ? `<button class="cta" type="button">${esc(slide.cta)}</button>` : "";
+    el.innerHTML = `
+      ${moduleLabelHtml()}
+      <div class="hero">${esc(slide.hero_label || slide.title)}</div>
+      <h1>${esc(slide.title)}</h1>
+      <div class="body">${renderBodyLines(slide.body)}</div>
+      ${cta}
+    `;
+    return el;
+  }
+
+  function renderL04(slide) {
+    const el = document.createElement("div");
+    el.className = "slide layout-l04";
+    const media = slide.media || { placeholder: "media placeholder" };
+    const heading = slide.heading ? `<h2>${esc(slide.heading)}</h2>` : "";
+    const bullets = (slide.bullets || []).map(b => `<li>${esc(b)}</li>`).join("");
+    el.innerHTML = `
+      ${moduleLabelHtml()}
+      <h1>${esc(slide.title)}</h1>
+      <div class="grid">
+        <div class="text">${heading}<div class="body">${renderBodyLines(slide.body || [])}</div><ul class="bullets">${bullets}</ul></div>
+        <div class="media">{{MEDIA_1}}<br>${esc(media.placeholder)}</div>
+      </div>
+    `;
+    return el;
+  }
+
+  function renderL05(slide) {
+    const el = document.createElement("div");
+    el.className = "slide layout-l05";
+    const cards = (slide.cards || []).map(card => `
+      <li class="card">
+        <span class="icon">${esc(card.icon || "•")}</span>
+        <h2>${esc(card.title)}</h2>
+        <p>${esc(card.body)}</p>
+      </li>
+    `).join("");
+    el.innerHTML = `
+      ${moduleLabelHtml()}
+      <h1>${esc(slide.title)}</h1>
+      <ul class="cards">${cards}</ul>
+    `;
+    return el;
+  }
+
+  function renderL06(slide) {
+    const el = document.createElement("div");
+    el.className = "slide layout-l06";
+    const columns = (slide.columns || []).slice(0, 2).map(col => `
+      <section class="compare-col">
+        <h2>${esc(col.heading)}</h2>
+        <ul class="bullets">${(col.items || []).map(i => `<li>${esc(i)}</li>`).join("")}</ul>
+      </section>
+    `).join("");
+    el.innerHTML = `
+      ${moduleLabelHtml()}
+      <h1>${esc(slide.title)}</h1>
+      <div class="compare">${columns}</div>
+    `;
+    return el;
+  }
+
+  function renderL07(slide) {
+    const el = document.createElement("div");
+    el.className = "slide layout-l07";
+    const steps = (slide.steps || []).map((step, i) => `
+      <li class="step">
+        <span class="num">${String(i + 1).padStart(2, "0")}</span>
+        <h2>${esc(step.label)}</h2>
+        <p>${esc(step.caption)}</p>
+      </li>
+    `).join("");
+    el.innerHTML = `
+      ${moduleLabelHtml()}
+      <h1>${esc(slide.title)}</h1>
+      <ol class="steps">${steps}</ol>
+    `;
+    return el;
+  }
+
+  function renderL08(slide) {
+    const el = document.createElement("div");
+    el.className = "slide layout-l08";
+    const nodes = (slide.nodes || []).map(node => `
+      <li class="node">
+        <h2>${esc(node.label)}</h2>
+        <p>${esc(node.body)}</p>
+      </li>
+    `).join("");
+    el.innerHTML = `
+      ${moduleLabelHtml()}
+      <h1>${esc(slide.title)}</h1>
+      <ol class="timeline">${nodes}</ol>
     `;
     return el;
   }
@@ -235,6 +355,120 @@
             </aside>
           </div>
         `;
+      }
+    }
+    draw();
+    return el;
+  }
+
+  function renderL10(slide) {
+    const el = document.createElement("div");
+    el.className = "slide layout-l10";
+    const scenario = state.scenarioState[slide.id] || { selectedIdx: null, submitted: false, isCorrect: null };
+
+    function draw() {
+      const choices = (slide.choices || []).map((choice, i) => {
+        const cls = [];
+        if (scenario.selectedIdx === i) cls.push("selected");
+        if (scenario.submitted) cls.push(choice.is_correct ? "correct-answer" : "disabled");
+        return `<li class="${cls.join(" ")}" data-idx="${i}">${esc(choice.label)}</li>`;
+      }).join("");
+      const selected = scenario.selectedIdx != null ? (slide.choices || [])[scenario.selectedIdx] : null;
+      const feedback = scenario.submitted && selected
+        ? `<aside class="feedback-panel ${scenario.isCorrect ? "correct" : "incorrect"}">
+             <h3>${scenario.isCorrect ? "Good decision" : "Consider the trade-off"}</h3>
+             <p>${esc(selected.feedback || "")}</p>
+           </aside>`
+        : "";
+      el.innerHTML = `
+        ${moduleLabelHtml()}
+        <h1>${esc(slide.title)}</h1>
+        <section class="context">${esc(slide.context)}</section>
+        <ul class="choices">${choices}</ul>
+        ${feedback}
+      `;
+      if (!scenario.submitted) {
+        el.querySelectorAll(".choices li").forEach(li => {
+          li.addEventListener("click", () => {
+            scenario.selectedIdx = parseInt(li.dataset.idx, 10);
+            const choice = (slide.choices || [])[scenario.selectedIdx];
+            scenario.isCorrect = !!(choice && choice.is_correct);
+            scenario.submitted = true;
+            state.scenarioState[slide.id] = scenario;
+            if (scenario.isCorrect) {
+              state.totalScore += (slide.points != null ? slide.points : 25);
+            }
+            draw();
+            refreshNextBtn();
+          });
+        });
+      }
+    }
+    draw();
+    return el;
+  }
+
+  function renderL11(slide) {
+    const el = document.createElement("div");
+    el.className = "slide layout-l11";
+    const pairs = slide.pairs || [];
+    const targets = pairs.map(p => p.target);
+    const match = state.matchState[slide.id] || {
+      selections: new Array(pairs.length).fill(""),
+      submitted: false,
+      isCorrect: null
+    };
+    state.matchState[slide.id] = match;
+
+    function draw() {
+      const rows = pairs.map((pair, i) => {
+        const opts = [`<option value="">Choose match</option>`].concat(targets.map(target => {
+          const selected = match.selections[i] === target ? "selected" : "";
+          return `<option value="${esc(target)}" ${selected}>${esc(target)}</option>`;
+        })).join("");
+        const result = match.submitted
+          ? `<span class="result ${match.selections[i] === pair.target ? "correct" : "incorrect"}">${match.selections[i] === pair.target ? "Correct" : "Review"}</span>`
+          : "";
+        return `
+          <li class="match-row">
+            <span class="item">${esc(pair.item)}</span>
+            <select data-idx="${i}" ${match.submitted ? "disabled" : ""}>${opts}</select>
+            ${result}
+          </li>
+        `;
+      }).join("");
+      const allSelected = match.selections.every(Boolean);
+      const feedback = match.submitted
+        ? `<aside class="feedback-panel ${match.isCorrect ? "correct" : "incorrect"}">
+             <h3>${match.isCorrect ? "All matched" : "Some matches need review"}</h3>
+             <p>${esc(match.isCorrect ? slide.feedback_correct : slide.feedback_incorrect)}</p>
+           </aside>`
+        : "";
+      el.innerHTML = `
+        ${moduleLabelHtml()}
+        <h1>${esc(slide.title)}</h1>
+        <p class="instruction">${esc(slide.instruction)}</p>
+        <ul class="matches">${rows}</ul>
+        <button class="submit-btn" ${allSelected || match.submitted ? "" : "disabled"}>Submit</button>
+        ${feedback}
+      `;
+      if (!match.submitted) {
+        el.querySelectorAll("select").forEach(select => {
+          select.addEventListener("change", () => {
+            match.selections[parseInt(select.dataset.idx, 10)] = select.value;
+            draw();
+          });
+        });
+        el.querySelector(".submit-btn").addEventListener("click", () => {
+          if (!match.selections.every(Boolean)) return;
+          match.submitted = true;
+          match.isCorrect = pairs.every((pair, i) => match.selections[i] === pair.target);
+          if (match.isCorrect) {
+            state.totalScore += (slide.points != null ? slide.points : 25);
+          }
+          draw();
+          refreshNextBtn();
+        });
       }
     }
     draw();

@@ -1,38 +1,45 @@
 ---
 name: scorm-pack
-description: Use after /build-html — packages a built module into a SCORM 1.2 zip for upload to SCORM Cloud. Fourth and final skill in the eLearning pipeline.
+description: Use after /build-html approval — packages an approved HTML module into a SCORM 1.2 zip for upload to SCORM Cloud. Fourth and final skill in the eLearning pipeline.
 ---
 
 # /scorm-pack
 
 ## Overview
 
-Wraps a built module in a SCORM 1.2 manifest + zip. Near-automatic. Produces `modules/<slug>/dist/<slug>.zip`.
+Wraps an already approved HTML build in a SCORM 1.2 manifest + zip. Near-automatic. Produces `modules/<slug>/dist/<slug>.zip`.
+
+This skill owns packaging only. It does not rewrite content files, rebuild the
+HTML shell, redesign screens, or change learner-facing text.
 
 ## When to use
 
-- User invokes `/scorm-pack` after `/build-html` phase 2 has been approved (G3)
+- User invokes `/scorm-pack` after `/build-html` has been approved (G3)
 
 ## Input
 
 A built module folder at `modules/<slug>/` containing:
 - `module.yml`
-- `content/*.md` (approved at G2)
+- `storyboard/` (approved at G2)
+- `content/*.md` (approved at G3 as part of the HTML build)
 - `build/` (populated and verified at G3)
 
 ## Workflow
 
-1. Run the pack script:
+1. Confirm `modules/<slug>/build/index.html` and
+   `modules/<slug>/build/content.json` exist.
+
+2. Run the packaging script:
    ```bash
-   python3 ~/Desktop/elearning-skills/scripts/pack_scorm.py ~/Desktop/elearning-skills/modules/<slug>
+   python3 ~/Desktop/elearning-skills/scripts/package_scorm.py ~/Desktop/elearning-skills/modules/<slug>
    ```
 
-2. Verify:
+3. Verify:
    ```bash
    ls -la ~/Desktop/elearning-skills/modules/<slug>/dist/
    ```
 
-3. Print report to the user:
+4. Print report to the user:
 
    ```
    SCORM package built: modules/<slug>/dist/<slug>.zip (<size> KB, <n> files)
@@ -48,16 +55,16 @@ A built module folder at `modules/<slug>/` containing:
    Next step: upload to https://cloud.scorm.com → Add Content → Upload
    ```
 
-4. Git auto-commit:
+5. Git auto-commit:
    ```bash
-   cd ~/Desktop/elearning-skills && git add modules/<slug>/dist/ && git commit -m "G4: SCORM package built for <slug>"
+   cd ~/Desktop/elearning-skills && git add modules/<slug>/build/imsmanifest.xml modules/<slug>/dist/ && git commit -m "G4: SCORM package built for <slug>"
    ```
 
-5. **STOP for G4 review.** User uploads to SCORM Cloud, launches, verifies API log + registration status.
+6. **STOP for G4 review.** User uploads to SCORM Cloud, launches, verifies API log + registration status.
 
 ## Rules
 
-1. Do not modify `content/` or `shell/` — those should be locked before `/scorm-pack` runs.
-2. If the pack script raises a validation error, report it exactly. Do not retry until fixed.
+1. Do not modify `content/`, `storyboard/`, or `shell/` — those should be locked before `/scorm-pack` runs.
+2. If the packaging script raises a validation error, report it exactly. Do not retry until fixed.
 3. Do not upload the zip for the user — uploading is a manual G4 step.
 4. On G4 failure, check: manifest well-formed? file list matches zip? score.raw in 0–100?

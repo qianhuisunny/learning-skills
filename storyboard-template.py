@@ -6,8 +6,8 @@ Reusable python-pptx module for generating storyboard cards.
 STYLE RULES:
 - Sentence case everywhere (not title case)
 - Body content starts at same left margin as title
-- Pop-ups have WHITE background panels overlaying the dark slide
-- Content inside pop-ups uses CHARCOAL text on white
+- Pop-ups are dark panels with blue (#1A9AFA) border, on-theme with the dark slide
+- Content inside pop-ups uses white/light text with dash-style bullets
 
 Usage:
     from storyboard_template import StoryboardBuilder
@@ -25,22 +25,30 @@ from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from pptx.enum.shapes import MSO_SHAPE
 
 
-# ── Dark EY Theme Constants ─────────────────────────────────────
-BG_COLOR        = RGBColor(0x1C, 0x23, 0x33)
-TITLE_BLUE      = RGBColor(0x1A, 0x9A, 0xFA)   # EY-Parthenon #1A9AFA
-COMPONENT_BLUE  = RGBColor(0x1A, 0x9A, 0xFA)   # EY-Parthenon #1A9AFA
-DARK_BLUE       = RGBColor(0x12, 0x6E, 0xB3)   # Darker shade for number badges
-GREEN_BULLET    = RGBColor(0x7A, 0xB6, 0x48)
-SUCCESS_GREEN   = RGBColor(0x27, 0xAE, 0x60)
-ERROR_RED       = RGBColor(0xC0, 0x39, 0x2B)
-WHITE           = RGBColor(0xFF, 0xFF, 0xFF)
-LIGHT_GRAY      = RGBColor(0xAA, 0xAA, 0xAA)
-MED_GRAY        = RGBColor(0x7F, 0x8C, 0x8D)
-FOOTER_GRAY     = RGBColor(0x88, 0x88, 0x88)
-BORDER_BLUE     = RGBColor(0x1A, 0x9A, 0xFA)   # EY-Parthenon #1A9AFA
-BORDER_LIGHT    = RGBColor(0xD5, 0xD8, 0xDC)
-YELLOW_ACCENT   = RGBColor(0xFF, 0xE6, 0x00)
-PANEL_BG        = RGBColor(0x25, 0x30, 0x45)
+# ── Dark EY Theme Constants — aligned to theme-dark.css tokens ──
+BG_COLOR        = RGBColor(0x1C, 0x23, 0x33)   # --bg-primary
+BG_SECONDARY    = RGBColor(0x25, 0x2D, 0x42)   # --bg-secondary
+BG_ELEVATED     = RGBColor(0x2E, 0x38, 0x4F)   # --bg-elevated
+BRAND_BLUE      = RGBColor(0x1A, 0x9A, 0xFA)   # --brand-blue
+BRAND_BLUE_DIM  = RGBColor(0x15, 0x78, 0xC4)   # --brand-blue-dim
+WHITE           = RGBColor(0xFF, 0xFF, 0xFF)    # --text-primary
+TEXT_SECONDARY  = RGBColor(0xB4, 0xBC, 0xD0)    # --text-secondary
+TEXT_MUTED      = RGBColor(0x7A, 0x82, 0x99)    # --text-muted
+YELLOW_ACCENT   = RGBColor(0xFF, 0xC8, 0x3D)    # --accent-yellow
+SUCCESS_GREEN   = RGBColor(0x2E, 0xCC, 0x71)    # --feedback-correct
+ERROR_RED       = RGBColor(0xE7, 0x4C, 0x3C)    # --feedback-incorrect
+FOOTER_GRAY     = RGBColor(0x7A, 0x82, 0x99)    # same as --text-muted
+
+# Aliases for backward compatibility
+TITLE_BLUE      = BRAND_BLUE
+COMPONENT_BLUE  = BRAND_BLUE
+DARK_BLUE       = BRAND_BLUE_DIM
+BORDER_BLUE     = BRAND_BLUE
+PANEL_BG        = BG_SECONDARY
+LIGHT_GRAY      = TEXT_SECONDARY
+MED_GRAY        = TEXT_MUTED
+GREEN_BULLET    = BRAND_BLUE    # bullets are blue dashes now, not green dots
+BORDER_LIGHT    = BG_ELEVATED
 CHARCOAL        = RGBColor(0x2C, 0x3E, 0x50)
 DARK_GRAY       = RGBColor(0x4A, 0x4A, 0x4A)
 FAINT_GRAY      = RGBColor(0xF4, 0xF6, 0xF7)
@@ -54,16 +62,16 @@ SLIDE_HEIGHT = Inches(7.5)
 LEFT_MARGIN   = Inches(0.7)
 CONTENT_WIDTH = Inches(11.9)
 
-# Pop-up white panel geometry
+# Pop-up dark panel geometry — respects LEFT_MARGIN
 POPUP_PANEL_TOP    = Inches(1.15)
-POPUP_PANEL_LEFT   = Inches(0.4)
-POPUP_PANEL_WIDTH  = Inches(12.5)
+POPUP_PANEL_LEFT   = LEFT_MARGIN
+POPUP_PANEL_WIDTH  = CONTENT_WIDTH
 POPUP_PANEL_HEIGHT = Inches(5.8)
 POPUP_PANEL_BOTTOM = POPUP_PANEL_TOP + POPUP_PANEL_HEIGHT
 
-# Inside the white panel, content margins
-POPUP_CONTENT_LEFT = Inches(0.7)
-POPUP_CONTENT_WIDTH = Inches(11.5)
+# Inside the dark panel, content margins
+POPUP_CONTENT_LEFT = LEFT_MARGIN + Inches(0.3)
+POPUP_CONTENT_WIDTH = CONTENT_WIDTH - Inches(0.6)
 POPUP_BAR_TOP      = POPUP_PANEL_TOP + Inches(0.1)
 POPUP_CONTENT_TOP  = POPUP_PANEL_TOP + Inches(0.8)
 
@@ -118,9 +126,16 @@ class StoryboardBuilder:
         p = tf.paragraphs[0]
         p.text = text
         p.font.size = size
-        p.font.color.rgb = TITLE_BLUE
+        p.font.color.rgb = WHITE
         p.font.bold = True
         p.font.name = FONT_TITLE
+        # Blue accent line under title (matches CSS)
+        line = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
+                                      LEFT_MARGIN, Inches(0.95),
+                                      CONTENT_WIDTH, Pt(3))
+        line.fill.solid()
+        line.fill.fore_color.rgb = BRAND_BLUE
+        line.line.fill.background()
 
     def _add_layout_badge(self, slide, slide_num, layout_id):
         tb = slide.shapes.add_textbox(Inches(10.5), Inches(0.4), Inches(2.5), Pt(25))
@@ -171,15 +186,15 @@ class StoryboardBuilder:
         return tf
 
     def _add_bullets(self, slide, items, left, top, width, height,
-                     size=Pt(15), bullet_color=GREEN_BULLET, text_color=WHITE):
+                     size=Pt(15), bullet_color=BRAND_BLUE, text_color=WHITE):
         tb = slide.shapes.add_textbox(left, top, width, height)
         tf = tb.text_frame
         tf.word_wrap = True
         for i, item in enumerate(items):
             p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
             r1 = p.add_run()
-            r1.text = "\u25CF  "
-            r1.font.size = Pt(12)
+            r1.text = "\u2013  "
+            r1.font.size = Pt(14)
             r1.font.color.rgb = bullet_color
             r1.font.name = FONT_BODY
             r2 = p.add_run()
@@ -191,19 +206,19 @@ class StoryboardBuilder:
             p.line_spacing = Pt(24)
         return tf
 
-    def _add_check_bullets(self, slide, items, left, top, width, height,
-                           size=Pt(15), check_color=COMPONENT_BLUE,
-                           text_color=CHARCOAL):
-        """Checkmark bullets — used inside white pop-up panels."""
+    def _add_dash_bullets(self, slide, items, left, top, width, height,
+                          size=Pt(15), dash_color=COMPONENT_BLUE,
+                          text_color=WHITE):
+        """Dash-style bullets — used inside dark pop-up panels."""
         tb = slide.shapes.add_textbox(left, top, width, height)
         tf = tb.text_frame
         tf.word_wrap = True
         for i, item in enumerate(items):
             p = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
             r1 = p.add_run()
-            r1.text = "\u2713  "
+            r1.text = "\u2013  "
             r1.font.size = Pt(14)
-            r1.font.color.rgb = check_color
+            r1.font.color.rgb = dash_color
             r1.font.name = FONT_BODY
             r2 = p.add_run()
             r2.text = item
@@ -249,55 +264,46 @@ class StoryboardBuilder:
 
     # ── Pop-up panel helpers ─────────────────────────────────────
 
-    def _add_popup_white_panel(self, slide):
-        """Draw the large white rectangle that IS the pop-up."""
+    def _add_popup_dark_panel(self, slide):
+        """Draw the dark panel with blue border that IS the pop-up."""
         panel = slide.shapes.add_shape(
             MSO_SHAPE.RECTANGLE,
             POPUP_PANEL_LEFT, POPUP_PANEL_TOP,
             POPUP_PANEL_WIDTH, POPUP_PANEL_HEIGHT)
         panel.fill.solid()
-        panel.fill.fore_color.rgb = WHITE
-        panel.line.fill.background()
+        panel.fill.fore_color.rgb = PANEL_BG
+        panel.line.color.rgb = BRAND_BLUE
+        panel.line.width = Pt(2)
         return panel
 
     def _add_popup_header(self, slide, comp_num, comp_title):
-        """Component bar with number badge and X close, at top of white panel."""
-        bar_y = POPUP_BAR_TOP
-        bar_h = Inches(0.5)
-        bar_x = POPUP_PANEL_LEFT + Inches(0.15)
-        bar_w = POPUP_PANEL_WIDTH - Inches(0.3)
-        # Bar background
-        bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
-                                     bar_x, bar_y, bar_w, bar_h)
-        bar.fill.solid()
-        bar.fill.fore_color.rgb = COMPONENT_BLUE
-        bar.line.fill.background()
-        # Number badge
-        badge_w = Inches(0.5)
-        badge = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
-                                       bar_x, bar_y, badge_w, bar_h)
-        badge.fill.solid()
-        badge.fill.fore_color.rgb = DARK_BLUE
-        badge.line.fill.background()
-        self._add_text(slide, f"{comp_num:02d}", bar_x, bar_y,
-                       badge_w, bar_h, size=Pt(15),
-                       color=WHITE, bold=True, align=PP_ALIGN.CENTER)
+        """Popup header matching CSS: blue num + title + X close + separator line."""
+        hdr_y = POPUP_BAR_TOP
+        hdr_h = Inches(0.5)
+        hdr_x = POPUP_PANEL_LEFT + Inches(0.3)
+        hdr_w = POPUP_PANEL_WIDTH - Inches(0.6)
+        # Number: blue text, no background
+        self._add_text(slide, f"{comp_num:02d}", hdr_x, hdr_y,
+                       Inches(0.6), hdr_h, size=Pt(18),
+                       color=BRAND_BLUE, bold=True)
         # Title text
         self._add_text(slide, comp_title,
-                       bar_x + badge_w + Inches(0.15), bar_y,
-                       bar_w - badge_w - Inches(1), bar_h,
-                       size=Pt(14), color=WHITE, bold=True)
-        # X close button
-        x_btn = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
-                                       bar_x + bar_w - Inches(0.5),
-                                       bar_y, Inches(0.5), bar_h)
-        x_btn.fill.solid()
-        x_btn.fill.fore_color.rgb = DARK_BLUE
-        x_btn.line.fill.background()
+                       hdr_x + Inches(0.6), hdr_y,
+                       hdr_w - Inches(1.2), hdr_h,
+                       size=Pt(16), color=WHITE, bold=True)
+        # X close button: text only, no background
         self._add_text(slide, "\u2715",
-                       bar_x + bar_w - Inches(0.5), bar_y,
-                       Inches(0.5), bar_h,
-                       size=Pt(16), color=WHITE, bold=True, align=PP_ALIGN.CENTER)
+                       hdr_x + hdr_w - Inches(0.4), hdr_y,
+                       Inches(0.4), hdr_h,
+                       size=Pt(18), color=TEXT_SECONDARY, bold=False,
+                       align=PP_ALIGN.CENTER)
+        # Separator line below header (CSS: border-bottom: 1px solid --bg-elevated)
+        sep = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
+                                     hdr_x, hdr_y + hdr_h + Inches(0.05),
+                                     hdr_w, Pt(1))
+        sep.fill.solid()
+        sep.fill.fore_color.rgb = BG_ELEVATED
+        sep.line.fill.background()
 
     # ── Public: Title Slide ──────────────────────────────────────
 
@@ -458,33 +464,35 @@ class StoryboardBuilder:
         self._add_slide_title(slide, title)
         self._add_layout_badge(slide, slide_num, "L07")
         n = len(steps)
-        step_w = Inches(2.2)
-        total_w = n * step_w + (n - 1) * Inches(0.8)
+        gap = Inches(0.25 if n > 5 else 0.8)
+        step_w = Emu((CONTENT_WIDTH - (n - 1) * gap) // n)
+        circle_size = Inches(0.45 if n > 5 else 0.5)
         start_x = LEFT_MARGIN
         y_circle = Inches(2.5)
         for i, (label, caption) in enumerate(steps):
-            x = start_x + i * (step_w + Inches(0.8))
+            x = start_x + i * (step_w + gap)
+            circle_x = x + Emu((step_w - circle_size) // 2)
             circle = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                            x + Inches(0.9), y_circle,
-                                            Inches(0.5), Inches(0.5))
+                                            circle_x, y_circle,
+                                            circle_size, circle_size)
             circle.fill.solid()
             circle.fill.fore_color.rgb = COMPONENT_BLUE
             circle.line.fill.background()
-            self._add_text(slide, str(i + 1), x + Inches(0.9), y_circle,
-                           Inches(0.5), Inches(0.5), size=Pt(16),
+            self._add_text(slide, str(i + 1), circle_x, y_circle,
+                           circle_size, circle_size, size=Pt(14 if n > 5 else 16),
                            color=WHITE, bold=True, align=PP_ALIGN.CENTER)
             if i < n - 1:
                 arrow = slide.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW,
-                                               x + Inches(1.5), y_circle + Inches(0.1),
-                                               Inches(0.7), Inches(0.3))
+                                               x + step_w, y_circle + Inches(0.1),
+                                               gap, Inches(0.3))
                 arrow.fill.solid()
                 arrow.fill.fore_color.rgb = LIGHT_GRAY
                 arrow.line.fill.background()
             self._add_text(slide, label, x, y_circle + Inches(0.7),
-                           step_w, Pt(25), size=Pt(16),
+                           step_w, Pt(34), size=Pt(13 if n > 5 else 16),
                            color=WHITE, bold=True, align=PP_ALIGN.CENTER)
             self._add_text(slide, caption, x, y_circle + Inches(1.2),
-                           step_w, Inches(1.5), size=Pt(13),
+                           step_w, Inches(1.7), size=Pt(10 if n > 5 else 13),
                            color=LIGHT_GRAY, align=PP_ALIGN.CENTER)
         if notes:
             self._add_speaker_notes(slide, notes)
@@ -718,7 +726,7 @@ class StoryboardBuilder:
 
     # ── Public: Anchor Slide (L12 Menu Grid) ─────────────────────
 
-    def _build_anchor_grid(self, slide, slide_num, title, subtitle, tiles,
+    def _build_anchor_bars(self, slide, slide_num, title, subtitle, tiles,
                            visited=None):
         self._add_slide_title(slide, title)
         badge_label = "L12" if not visited else "L12 — Visited"
@@ -770,7 +778,7 @@ class StoryboardBuilder:
 
     def add_anchor(self, slide_num, title, tiles, subtitle="", notes=""):
         slide = self._new_slide()
-        self._build_anchor_grid(slide, slide_num, title, subtitle, tiles)
+        self._build_anchor_bars(slide, slide_num, title, subtitle, tiles)
         if notes:
             self._add_speaker_notes(slide, notes)
         self._add_footer(slide)
@@ -781,33 +789,144 @@ class StoryboardBuilder:
         slide = self._new_slide()
         if visited is None:
             visited = set(range(len(tiles)))
-        self._build_anchor_grid(slide, slide_num, title, subtitle, tiles,
+        self._build_anchor_bars(slide, slide_num, title, subtitle, tiles,
                                 visited=visited)
         if notes:
             self._add_speaker_notes(slide, notes)
         self._add_footer(slide)
         return slide
 
-    # ── Public: Pop-up Slides (WHITE panel on dark slide) ────────
+    # ── Public: Timeline Anchor (L12 horizontal) ────────────────
+
+    def add_timeline_anchor(self, slide_num, title, steps, subtitle="",
+                             visited=None, images=None, notes=""):
+        """L12 as horizontal timeline — image placeholders above numbered
+        circles on a connecting line, step labels below."""
+        slide = self._new_slide()
+        self._add_slide_title(slide, title)
+        badge_text = "L12 — Timeline" + (" visited" if visited else "")
+        self._add_layout_badge(slide, slide_num, badge_text)
+        if subtitle:
+            tb = slide.shapes.add_textbox(LEFT_MARGIN, Inches(1.05),
+                                          Inches(10), Pt(22))
+            tf = tb.text_frame
+            tf.word_wrap = True
+            p = tf.paragraphs[0]
+            p.text = subtitle
+            p.font.size = Pt(13)
+            p.font.color.rgb = LIGHT_GRAY
+            p.font.italic = True
+            p.font.name = FONT_BODY
+        visited = visited or set()
+        n = len(steps)
+        cd = Inches(0.42)
+        cr = cd // 2
+        img_h = Inches(1.1)
+        img_w = Inches(1.3)
+        group_h = img_h + Inches(0.2) + cd + Inches(0.1) + Inches(0.7)
+        avail_top = Inches(1.45)
+        avail_bot = Inches(6.9)
+        img_y = avail_top + (avail_bot - avail_top - group_h) // 2
+        y_top = img_y + img_h + Inches(0.2)
+        y_mid = y_top + cr
+        total_span = Inches(10.2)
+        gap = total_span // (n - 1) if n > 1 else 0
+        x0 = (SLIDE_WIDTH - total_span) // 2 - cr
+        line = slide.shapes.add_shape(
+            MSO_SHAPE.RECTANGLE,
+            x0 + cr, y_mid - Pt(1), gap * (n - 1), Pt(2))
+        line.fill.solid()
+        line.fill.fore_color.rgb = RGBColor(0x15, 0x5A, 0x8A)
+        line.line.fill.background()
+        for i, (num_label, title_text) in enumerate(steps):
+            cx = x0 + i * gap
+            is_v = i in visited
+            img_label = images[i] if images and i < len(images) else f"{{{{IMG_{i+1}}}}}"
+            img_x = cx + cr - img_w // 2
+            self._add_media_placeholder(slide, img_label,
+                                        img_x, img_y, img_w, img_h)
+            circ = slide.shapes.add_shape(MSO_SHAPE.OVAL, cx, y_top, cd, cd)
+            if is_v:
+                circ.fill.solid()
+                circ.fill.fore_color.rgb = SUCCESS_GREEN
+                circ.line.color.rgb = SUCCESS_GREEN
+            else:
+                circ.fill.solid()
+                circ.fill.fore_color.rgb = BG_SECONDARY
+                circ.line.color.rgb = BRAND_BLUE
+            circ.line.width = Pt(2)
+            nc = WHITE if is_v else BRAND_BLUE
+            tb = slide.shapes.add_textbox(cx, y_top, cd, cd)
+            tf = tb.text_frame
+            tf.word_wrap = False
+            tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+            p = tf.paragraphs[0]
+            p.text = num_label
+            p.font.size = Pt(12)
+            p.font.color.rgb = nc
+            p.font.bold = True
+            p.font.name = FONT_TITLE
+            p.alignment = PP_ALIGN.CENTER
+            lw = gap if gap else Inches(1.5)
+            lx = cx + cr - lw // 2
+            self._add_text(slide, title_text,
+                           lx, y_top + cd + Inches(0.1), lw, Inches(1.2),
+                           size=Pt(11), color=TEXT_SECONDARY,
+                           align=PP_ALIGN.CENTER)
+        if notes:
+            self._add_speaker_notes(slide, notes)
+        self._add_footer(slide)
+        return slide
+
+    # ── Public: Pop-up Slides (dark panel + blue border) ─────────
 
     def add_popup_text(self, slide_num, anchor_title, comp_num, comp_title,
-                       body="", bullets=None, notes=""):
-        """Pop-up: white panel with full-width text + checkmark bullets."""
+                       body="", bullets=None, key_message="", ey_role="",
+                       notes=""):
+        """Pop-up: dark panel with text + dash bullets + EY Role + key message."""
         slide = self._new_slide()
         self._add_slide_title(slide, anchor_title)
         self._add_layout_badge(slide, slide_num, "Pop-up on anchor")
-        self._add_popup_white_panel(slide)
+        self._add_popup_dark_panel(slide)
         self._add_popup_header(slide, comp_num, comp_title)
         ct = POPUP_CONTENT_TOP
         if body:
             self._add_text(slide, body, POPUP_CONTENT_LEFT, ct,
                            POPUP_CONTENT_WIDTH, Inches(1.2),
-                           size=Pt(16), color=CHARCOAL)
+                           size=Pt(16), color=WHITE)
             ct += Inches(1.0)
         if bullets:
-            self._add_check_bullets(slide, bullets, POPUP_CONTENT_LEFT, ct,
+            self._add_dash_bullets(slide, bullets, POPUP_CONTENT_LEFT, ct,
                                     POPUP_CONTENT_WIDTH, Inches(3.5),
-                                    size=Pt(15), text_color=CHARCOAL)
+                                    size=Pt(15), text_color=WHITE)
+        if ey_role:
+            ey_y = POPUP_PANEL_BOTTOM - Inches(1.7)
+            self._add_section_label(slide, "EY ROLE",
+                                    POPUP_CONTENT_LEFT, ey_y,
+                                    color=BRAND_BLUE)
+            self._add_text(slide, ey_role,
+                           POPUP_CONTENT_LEFT + Inches(0.2), ey_y + Inches(0.25),
+                           POPUP_CONTENT_WIDTH - Inches(0.2), Inches(0.6),
+                           size=Pt(13), color=TEXT_SECONDARY)
+        if key_message:
+            km_y = POPUP_PANEL_BOTTOM - Inches(0.85)
+            km_bar = slide.shapes.add_shape(
+                MSO_SHAPE.RECTANGLE,
+                POPUP_CONTENT_LEFT, km_y,
+                POPUP_CONTENT_WIDTH, Inches(0.55))
+            km_bar.fill.solid()
+            km_bar.fill.fore_color.rgb = RGBColor(0x33, 0x2D, 0x1A)
+            km_bar.line.fill.background()
+            accent = slide.shapes.add_shape(
+                MSO_SHAPE.RECTANGLE,
+                POPUP_CONTENT_LEFT, km_y, Pt(4), Inches(0.55))
+            accent.fill.solid()
+            accent.fill.fore_color.rgb = YELLOW_ACCENT
+            accent.line.fill.background()
+            self._add_text(slide, key_message,
+                           POPUP_CONTENT_LEFT + Inches(0.2), km_y,
+                           POPUP_CONTENT_WIDTH - Inches(0.4), Inches(0.55),
+                           size=Pt(13), color=YELLOW_ACCENT, bold=True)
         if notes:
             self._add_speaker_notes(slide, notes)
         self._add_footer(slide)
@@ -815,26 +934,26 @@ class StoryboardBuilder:
 
     def add_popup_text_media(self, slide_num, anchor_title, comp_num, comp_title,
                              bullets=None, media_label="", body="", notes=""):
-        """Pop-up: white panel with text/bullets left + media placeholder right."""
+        """Pop-up: dark panel with text/bullets left + media placeholder right."""
         slide = self._new_slide()
         self._add_slide_title(slide, anchor_title)
         self._add_layout_badge(slide, slide_num, "Pop-up on anchor")
-        self._add_popup_white_panel(slide)
+        self._add_popup_dark_panel(slide)
         self._add_popup_header(slide, comp_num, comp_title)
         ct = POPUP_CONTENT_TOP
         lw = Inches(6)
         if body:
             self._add_text(slide, body, POPUP_CONTENT_LEFT, ct,
-                           lw, Inches(1), size=Pt(15), color=CHARCOAL)
+                           lw, Inches(1), size=Pt(15), color=WHITE)
             ct += Inches(0.8)
         if bullets:
-            self._add_check_bullets(slide, bullets, POPUP_CONTENT_LEFT, ct,
+            self._add_dash_bullets(slide, bullets, POPUP_CONTENT_LEFT, ct,
                                     lw, Inches(3.5), size=Pt(14),
-                                    text_color=CHARCOAL)
+                                    text_color=WHITE)
         if media_label:
             self._add_media_placeholder(slide, media_label,
                                         Inches(7.5), POPUP_CONTENT_TOP,
-                                        Inches(5), Inches(4), on_white=True)
+                                        Inches(5), Inches(4))
         if notes:
             self._add_speaker_notes(slide, notes)
         self._add_footer(slide)
@@ -843,17 +962,17 @@ class StoryboardBuilder:
     def add_popup_stepper(self, slide_num, popup_title, comp_num, comp_title,
                           bullets=None, steps=None, extra_sections=None,
                           notes=""):
-        """Pop-up: white panel with bullets + stepper/process flow."""
+        """Pop-up: dark panel with bullets + stepper/process flow."""
         slide = self._new_slide()
         self._add_slide_title(slide, popup_title)
         self._add_layout_badge(slide, slide_num, "Pop-up on anchor")
-        self._add_popup_white_panel(slide)
+        self._add_popup_dark_panel(slide)
         self._add_popup_header(slide, comp_num, comp_title)
         ct = POPUP_CONTENT_TOP
         if bullets:
-            self._add_check_bullets(slide, bullets, POPUP_CONTENT_LEFT, ct,
+            self._add_dash_bullets(slide, bullets, POPUP_CONTENT_LEFT, ct,
                                     Inches(6), Inches(3), size=Pt(13),
-                                    text_color=CHARCOAL)
+                                    text_color=WHITE)
         if steps:
             sx = Inches(7.0)
             sy = POPUP_CONTENT_TOP
@@ -880,7 +999,7 @@ class StoryboardBuilder:
                 x = sx + i * (step_w + Inches(0.3))
                 self._add_text(slide, caption, x, sy + Inches(0.9),
                                step_w, Inches(0.6), size=Pt(10),
-                               color=DARK_GRAY, align=PP_ALIGN.CENTER)
+                               color=LIGHT_GRAY, align=PP_ALIGN.CENTER)
         if extra_sections:
             ey = Inches(4.8)
             for sec_title, sec_items in extra_sections:
@@ -890,7 +1009,7 @@ class StoryboardBuilder:
                 ey += Inches(0.3)
                 for item in sec_items:
                     self._add_text(slide, item, POPUP_CONTENT_LEFT + Inches(0.3), ey,
-                                   Inches(11), Pt(18), size=Pt(12), color=DARK_GRAY)
+                                   Inches(11), Pt(18), size=Pt(12), color=LIGHT_GRAY)
                     ey += Inches(0.3)
                 ey += Inches(0.15)
         if notes:
@@ -902,11 +1021,11 @@ class StoryboardBuilder:
                           col_a_header="", col_a_items=None,
                           col_b_header="", col_b_items=None,
                           key_message="", notes=""):
-        """Pop-up: white panel with 2-column comparison."""
+        """Pop-up: dark panel with 2-column comparison."""
         slide = self._new_slide()
         self._add_slide_title(slide, popup_title)
         self._add_layout_badge(slide, slide_num, "Pop-up on anchor")
-        self._add_popup_white_panel(slide)
+        self._add_popup_dark_panel(slide)
         self._add_popup_header(slide, comp_num, comp_title)
         self._add_section_label(slide, "WHAT THIS COMPONENT COVERS",
                                 POPUP_CONTENT_LEFT, POPUP_CONTENT_TOP,
@@ -914,27 +1033,27 @@ class StoryboardBuilder:
         col_w = Inches(5.5)
         ax = POPUP_CONTENT_LEFT
         self._add_section_label(slide, col_a_header, ax,
-                                POPUP_CONTENT_TOP + Inches(0.5), color=CHARCOAL)
+                                POPUP_CONTENT_TOP + Inches(0.5), color=LIGHT_GRAY)
         if col_a_items:
             self._add_bullets(slide, col_a_items,
                               ax + Inches(0.2), POPUP_CONTENT_TOP + Inches(0.9),
                               col_w, Inches(2.5), size=Pt(13),
-                              bullet_color=COMPONENT_BLUE, text_color=CHARCOAL)
+                              bullet_color=COMPONENT_BLUE, text_color=WHITE)
         bx = Inches(7.0)
         self._add_section_label(slide, col_b_header, bx,
-                                POPUP_CONTENT_TOP + Inches(0.5), color=CHARCOAL)
+                                POPUP_CONTENT_TOP + Inches(0.5), color=LIGHT_GRAY)
         if col_b_items:
             self._add_bullets(slide, col_b_items,
                               bx + Inches(0.2), POPUP_CONTENT_TOP + Inches(0.9),
                               col_w, Inches(2.5), size=Pt(13),
-                              bullet_color=COMPONENT_BLUE, text_color=CHARCOAL)
+                              bullet_color=COMPONENT_BLUE, text_color=WHITE)
         if key_message:
             self._add_section_label(slide, "KEY MESSAGE",
                                     POPUP_CONTENT_LEFT, Inches(5.5),
                                     color=COMPONENT_BLUE)
             self._add_text(slide, key_message, POPUP_CONTENT_LEFT, Inches(5.8),
                            POPUP_CONTENT_WIDTH, Inches(0.6),
-                           size=Pt(14), color=DARK_GRAY)
+                           size=Pt(14), color=LIGHT_GRAY)
         if notes:
             self._add_speaker_notes(slide, notes)
         self._add_footer(slide)
@@ -942,12 +1061,12 @@ class StoryboardBuilder:
 
     def add_popup_grid(self, slide_num, popup_title, comp_num, comp_title,
                        key_message="", grid_items=None, notes=""):
-        """Pop-up: white panel with 2x2 grid.
+        """Pop-up: dark panel with 2x2 grid.
         grid_items: list of (header, body) tuples."""
         slide = self._new_slide()
         self._add_slide_title(slide, popup_title)
         self._add_layout_badge(slide, slide_num, "Pop-up on anchor")
-        self._add_popup_white_panel(slide)
+        self._add_popup_dark_panel(slide)
         self._add_popup_header(slide, comp_num, comp_title)
         if key_message:
             self._add_section_label(slide, "KEY MESSAGE",
@@ -956,7 +1075,7 @@ class StoryboardBuilder:
             self._add_text(slide, key_message,
                            POPUP_CONTENT_LEFT, POPUP_CONTENT_TOP + Inches(0.3),
                            POPUP_CONTENT_WIDTH, Inches(0.5),
-                           size=Pt(13), color=DARK_GRAY)
+                           size=Pt(13), color=LIGHT_GRAY)
         if grid_items:
             grid_w = Inches(5.5)
             grid_h = Inches(1.3)
@@ -969,13 +1088,13 @@ class StoryboardBuilder:
                 x = POPUP_CONTENT_LEFT + col * (grid_w + gap_x)
                 y = start_y + row * (grid_h + gap_y)
                 self._add_content_box(slide, x, y, grid_w, grid_h,
-                                      fill_color=FAINT_GRAY, border_color=BORDER_LIGHT)
+                                      fill_color=PANEL_BG, border_color=BORDER_BLUE)
                 self._add_section_label(slide, header, x + Inches(0.2),
                                         y + Inches(0.1), width=grid_w,
                                         color=COMPONENT_BLUE)
                 self._add_text(slide, body, x + Inches(0.2), y + Inches(0.4),
                                grid_w - Inches(0.4), grid_h - Inches(0.5),
-                               size=Pt(13), color=CHARCOAL)
+                               size=Pt(13), color=LIGHT_GRAY)
         if notes:
             self._add_speaker_notes(slide, notes)
         self._add_footer(slide)
@@ -989,22 +1108,34 @@ class StoryboardBuilder:
     # ── Public: Layout L13 — Objective / Agenda ──────────────────
 
     def add_L13(self, slide_num, title, objectives, notes=""):
+        """L13 objectives — matches CSS: bg-secondary bar + blue left border + blue counter."""
         slide = self._new_slide()
         self._add_slide_title(slide, title)
         self._add_layout_badge(slide, slide_num, "L13")
-        y = Inches(1.8)
+        bar_w = Inches(10.0)
+        bar_h = Inches(0.65)
+        gap = Inches(0.15)
+        y = Inches(1.65)
         for i, obj in enumerate(objectives):
-            circle = slide.shapes.add_shape(MSO_SHAPE.OVAL,
-                                            LEFT_MARGIN, y, Inches(0.4), Inches(0.4))
-            circle.fill.solid()
-            circle.fill.fore_color.rgb = COMPONENT_BLUE
-            circle.line.fill.background()
-            self._add_text(slide, str(i + 1), LEFT_MARGIN, y,
-                           Inches(0.4), Inches(0.4), size=Pt(14),
-                           color=WHITE, bold=True, align=PP_ALIGN.CENTER)
-            self._add_text(slide, obj, LEFT_MARGIN + Inches(0.6), y,
-                           Inches(11), Inches(0.5), size=Pt(16))
-            y += Inches(0.7)
+            bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
+                                         LEFT_MARGIN, y, bar_w, bar_h)
+            bar.fill.solid()
+            bar.fill.fore_color.rgb = BG_SECONDARY
+            bar.line.fill.background()
+            accent = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
+                                            LEFT_MARGIN, y, Pt(4), bar_h)
+            accent.fill.solid()
+            accent.fill.fore_color.rgb = BRAND_BLUE
+            accent.line.fill.background()
+            self._add_text(slide, f"{i+1:02d}",
+                           LEFT_MARGIN + Inches(0.2), y,
+                           Inches(0.6), bar_h,
+                           size=Pt(18), color=BRAND_BLUE, bold=True)
+            self._add_text(slide, obj,
+                           LEFT_MARGIN + Inches(0.8), y,
+                           bar_w - Inches(1.0), bar_h,
+                           size=Pt(15), color=WHITE)
+            y += bar_h + gap
         if notes:
             self._add_speaker_notes(slide, notes)
         self._add_footer(slide)
@@ -1013,15 +1144,34 @@ class StoryboardBuilder:
     # ── Public: Layout L14 — Summary ─────────────────────────────
 
     def add_L14(self, slide_num, title, takeaways, cta="Continue", notes=""):
+        """L14 summary — matches CSS: bg-secondary bar + yellow left border."""
         slide = self._new_slide()
         self._add_slide_title(slide, title)
         self._add_layout_badge(slide, slide_num, "L14")
-        self._add_bullets(slide, takeaways, LEFT_MARGIN, Inches(1.8),
-                          CONTENT_WIDTH, Inches(4))
+        bar_w = Inches(10.0)
+        bar_h = Inches(0.7)
+        gap = Inches(0.15)
+        y = Inches(1.65)
+        for item in takeaways:
+            bar = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
+                                         LEFT_MARGIN, y, bar_w, bar_h)
+            bar.fill.solid()
+            bar.fill.fore_color.rgb = BG_SECONDARY
+            bar.line.fill.background()
+            accent = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE,
+                                            LEFT_MARGIN, y, Pt(4), bar_h)
+            accent.fill.solid()
+            accent.fill.fore_color.rgb = YELLOW_ACCENT
+            accent.line.fill.background()
+            self._add_text(slide, item,
+                           LEFT_MARGIN + Inches(0.3), y,
+                           bar_w - Inches(0.5), bar_h,
+                           size=Pt(15), color=WHITE)
+            y += bar_h + gap
         btn = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE,
                                      Inches(10.5), Inches(6.2), Inches(2), Inches(0.5))
         btn.fill.solid()
-        btn.fill.fore_color.rgb = COMPONENT_BLUE
+        btn.fill.fore_color.rgb = BRAND_BLUE
         btn.line.fill.background()
         self._add_text(slide, cta, Inches(10.5), Inches(6.2),
                        Inches(2), Inches(0.5), size=Pt(14),

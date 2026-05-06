@@ -27,7 +27,22 @@ Objectives must describe actions or decisions learners perform on the job—not 
 
 **Test:** Ask "Would someone actually do this verb at work?" If not, reframe toward the real job behavior.
 
-### 3. Consistent Column Structure
+### 3. Bloom-Level Alignment
+
+The practice and assessment must ask for the same kind of thinking as the
+objective. Do not pair an Apply, Analyze, or Evaluate objective with a recall
+question just because an MCQ is easy to write.
+
+| Bloom level | Typical objective verbs | Assessment fit |
+|-------------|-------------------------|----------------|
+| Remember | identify, list, recall | Direct MCQ, label, match |
+| Understand | explain, summarize, distinguish | MCQ with explanation, compare, classify |
+| Apply | select, use, perform | Scenario-based MCQ, worked decision, simulation |
+| Analyze | diagnose, compare, prioritize | Case analysis, scenario MCQ, sorting evidence |
+| Evaluate | judge, recommend, justify | Scenario choice, roleplay, defended recommendation |
+| Create | design, produce, construct | Performance task, artifact, project |
+
+### 4. Consistent Column Structure
 
 Use the same framework across all modules:
 
@@ -36,7 +51,7 @@ Use the same framework across all modules:
 
 Optional columns (when relevant): **Integration** (application to ongoing case study), **Delivery Channel**, **Knowledge Type**
 
-### 4. Appropriate Stakeholder Detail
+### 5. Appropriate Stakeholder Detail
 
 Include enough to show alignment and feasibility. Avoid:
 - Slide-by-slide breakdowns (that's storyboarding)
@@ -63,7 +78,9 @@ Include enough to show alignment and feasibility. Avoid:
 Before finalizing, verify:
 
 - [ ] Every objective uses an action verb describing a job task
+- [ ] Every objective has an explicit or inferable Bloom level
 - [ ] Every objective has a corresponding assessment method
 - [ ] Practice activities give learners a chance to fail safely before assessment
+- [ ] Practice and assessment match the Bloom level of the objective
 - [ ] Presentation content directly enables the objective (no "nice to know" padding)
 - [ ] Gaps are explicitly flagged (e.g., "Practice is thin for Objective 1—add matching exercise")

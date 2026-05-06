@@ -6,7 +6,7 @@
 
 ## Context
 
-Build a personal pipeline that takes a module brief and produces a SCORM 1.2 package ready to upload to SCORM Cloud (cloud.scorm.com). The pipeline is three Claude Code skills chained through human review gates. Output is dark-themed HTML/CSS/JS in the EY-Parthenon visual style.
+Build a personal pipeline that takes a module brief and produces a SCORM 1.2 package ready to upload to SCORM Cloud (cloud.scorm.com). The pipeline is four Claude Code skills chained through human review gates. Output is dark-themed HTML/CSS/JS in the EY-Parthenon visual style.
 
 MVP is one pilot module (Module 2.5), six layouts, one LMS target (SCORM Cloud). Everything else is deferred by explicit decision.
 
@@ -17,17 +17,17 @@ MVP is one pilot module (Module 2.5), six layouts, one LMS target (SCORM Cloud).
 ### Pipeline shape
 
 ```
-Raw input         /content-map      /build-html       /scorm-pack
-(topic / PDF / → ────────────  → ────────────  →  ────────────  →
- lesson plan)    content-map.md    content/*.md      dist/*.zip
-                                   build/ (HTML)
+Raw input         /content-map      /storyboard       /build-html       /scorm-pack
+(topic / PDF / → ────────────  → ────────────  →  ────────────  →  ────────────  →
+ lesson plan)    content-map.md    storyboard/       content/*.md      dist/*.zip
+                                  storyboard.pptx    build/ (HTML)
 ```
 
 Between every stage sits a **human review gate** — no skill auto-triggers the next. Four review gates total:
 
 1. **G1** — after `/content-map`: review the O-A-P-P table
-2. **G2** — after `/build-html` phase 1: review slide list + individual content files
-3. **G3** — after `/build-html` phase 2: walk the full module in the browser
+2. **G2** — after `/storyboard`: review screen flow, interaction states, canonical layouts, and storyboard artifact
+3. **G3** — after `/build-html`: walk the full module in the browser
 4. **G4** — after `/scorm-pack`: upload zip to SCORM Cloud, verify Launch + API log
 
 ### Per-module folder
@@ -38,16 +38,21 @@ Each module lives in its own folder. Copying the folder = cloning the module.
 modules/
   2.5-procurement-plan/
     content-map.md               ← Stage 1 output
-    content/                     ← Stage 2 phase 1 output (authoring layer)
+    storyboard/                  ← Stage 2 output (screen-level spec + optional prototype)
+      storyboard.md
+      storyboard.json
+      prototype/
+    storyboard.pptx              ← Stage 2 stakeholder review artifact
+    content/                     ← Stage 3 authoring layer
       00-title.md                each slide = one markdown file
       01-objectives.md           YAML frontmatter + body
       ...
       15-summary.md
-    build/                       ← Stage 2 phase 2 output (runnable)
+    build/                       ← Stage 3 output (runnable)
       index.html                 copied from shell
       content.json               merged from content/*.md
       css/ js/ assets/           copied from shell
-    dist/                        ← Stage 3 output
+    dist/                        ← Stage 4 output
       2.5-procurement-plan.zip   SCORM package
 ```
 
@@ -72,7 +77,7 @@ Written once, reused by every module. Analogous to a Storyline player + slide ma
   manifest-template.xml    imsmanifest.xml Jinja template (used by /scorm-pack)
 ```
 
-The `/build-html` phase 2 step is effectively `cp -r shell/* modules/<name>/build/` followed by merging `content/*.md` into `build/content.json`.
+The `/build-html` step is effectively `cp -r shell/* modules/<name>/build/` followed by merging `content/*.md` into `build/content.json`. SCORM manifest generation and zipping happen later in `/scorm-pack`.
 
 **Decisions locked in this section:**
 
@@ -93,6 +98,7 @@ Installed as personal skills (not a plugin):
 ```
 ~/.claude/skills/
   content-map/SKILL.md
+  storyboard/SKILL.md
   build-html/SKILL.md
   scorm-pack/SKILL.md
 ```
@@ -126,78 +132,52 @@ Each skill is conversational: user invokes the slash command, Claude dialogues, 
 
 **G1 review:** User verifies every row uses action verbs, alignment is tight end-to-end, no "nice to know" padding, scope is appropriate.
 
-### Skill 2 — `/build-html` (storyboard thinking + HTML generation)
+### Skill 2 — `/storyboard` (experience design)
 
-Two phases with a review gate between them.
+**Role:** Turn the approved O-A-P-P map into a screen-level eLearning storyboard.
 
-#### Phase 1 — Storyboard thinking (one slide per file)
-
-**Input:** `content-map.md` + optional reference material.
+**Input:** `content-map.md` approved at G1 + optional reference material.
 
 **Behavior:**
-1. Read the O-A-P-P table. For each row decide how many slides and which layout each slide uses.
-2. For each slide produce one markdown file with YAML frontmatter:
+1. Read the O-A-P-P table and preserve its instructional sequence.
+2. Decide screen count, screen order, canonical layouts, interaction types, and states.
+3. Write `modules/<name>/storyboard/storyboard.md` as the canonical screen-level spec, using the shared layout registry.
+4. Optionally create an HTML-first storyboard prototype in `modules/<name>/storyboard/prototype/` to verify layout and interaction states. This is a review prototype, not the production build.
+5. Generate `modules/<name>/storyboard.pptx` when a PPT review artifact is needed.
+6. Present a summary table to the user (screen ID, title, layout, type, notes).
 
-   ```
-   ---
-   id: 03-concept-what-is-pp
-   layout: L03
-   title: What is a procurement plan
-   ---
+**Output:** `modules/<name>/storyboard/` plus optional `storyboard.pptx`.
 
-   ## On-screen
-   **Title:** What is a procurement plan
-   **Body bullets:**
-   - A document that defines how purchases will be managed
-   - Covers vendor selection, contract type, delivery timing
-   - Living document, updated through project lifecycle
-   **Media:** {{MEDIA_1}} — photo of signed contract on desk
+**G2 review:** User reviews screen flow, interaction states, storyboard wording level, canonical layouts, and the stakeholder artifact. Fixes stay inside `/storyboard` until approved.
 
-   ## Voiceover
-   [~20 sec conversational VO]
+### Skill 3 — `/build-html` (HTML implementation)
 
-   ## Interaction & dev notes
-   - No interaction, click Continue
-   - Visited state tracked
-   ```
+**Role:** Implement the approved storyboard as a runnable HTML module using the shared shell.
 
-3. Write `modules/<name>/content/NN-slug.md` for each slide.
-4. Present a summary table to the user (slide #, file, title, layout, type, notes).
-
-**G2 review:** User reviews slide count, layout choices, order, individual content. Two ways to fix: hand-edit any `content/*.md` directly, or describe problems in natural language and let Claude route the edits.
-
-#### Phase 2 — Build step (near-automatic)
+**Input:** `storyboard/storyboard.md` or `storyboard.json` approved at G2.
 
 **Behavior:**
-1. Merge `content/*.md` into `build/content.json`.
-2. Copy `shell/*` into `modules/<name>/build/`.
-3. Done — `build/index.html` is runnable by double-click.
+1. Verify the shell can render every approved canonical layout; extend the shell if it cannot.
+2. Translate each approved storyboard screen into `modules/<name>/content/NN-slug.md` with YAML frontmatter matching `shell/content.schema.md`.
+3. Write or update `modules/<name>/module.yml`.
+4. Run `scripts/build_html.py` to copy `shell/*` into `build/` and merge `content/*.md` into `build/content.json`.
+5. Start a local server for browser review.
 
-**Output:** `modules/<name>/build/` (a runnable HTML module).
+**Output:** `modules/<name>/content/*.md` and `modules/<name>/build/` (runnable HTML).
 
-**G3 review:** User double-clicks `build/index.html`, walks through the full module in the browser. Verifies every layout, pop-up interaction, MCQ behavior, and dark theme consistency.
+**G3 review:** User walks through the full module in the browser. Content fixes go to `content/*.md`; storyboard mismatches return to `/storyboard`; unsupported runtime layouts default to extending `shell/`; temporary adaptation requires explicit approval and an `adapted_from` note.
 
-**Feedback loop at G3 (important):** User describes problems in plain language. Claude routes the fix to the correct layer:
-
-- **Content fix** ("slide 4 title should be X") → edit the specific `content/*.md`, re-run phase 2.
-- **Layout fix** ("slide 6 should be L06 not L03") → change `layout:` in frontmatter + rewrite body to fit the new layout, re-run phase 2.
-- **Shell visual fix** ("all pop-up borders are too thin") → edit `shell/css/layouts.css`, re-run phase 2. **Claude confirms first**, because shell changes affect every future module.
-- **Shell behavior fix** ("visited checkmark doesn't show after pop-up close") → edit `shell/js/app.js`, re-run phase 2.
-
-User never has to know which file to edit — they describe the problem, Claude routes it.
-
-### Skill 3 — `/scorm-pack` (package & ship)
+### Skill 4 — `/scorm-pack` (package & ship)
 
 **Role:** Package a built module into a SCORM 1.2 zip. Near-automatic.
 
 **Input:** A built module folder (`modules/<name>/` with `build/` populated). Optional metadata: title, SCORM identifier, version.
 
 **Behavior:**
-1. Read `build/content.json` for module title etc.
+1. Read the approved `build/content.json` for module title etc.
 2. Fill `shell/manifest-template.xml` → write `build/imsmanifest.xml`.
-3. Copy `shell/schemas/*.xsd` → `build/schemas/`.
-4. Zip `build/` → `dist/<name>.zip`.
-5. Print a report: file count, size, expected SCORM API call sequence on run.
+3. Zip the approved `build/` → `dist/<name>.zip`.
+4. Print a report: file count, size, expected SCORM API call sequence on run.
 
 **Output:** `dist/<name>.zip` — directly uploadable to SCORM Cloud.
 
@@ -205,11 +185,11 @@ User never has to know which file to edit — they describe the problem, Claude 
 
 ### Git auto-commit (in scope for MVP)
 
-At every review gate, the skill commits the current state of `modules/<name>/` (or `shell/` for shell-level changes) with a structured message like `G2: content files approved for 2.5-procurement-plan`. This gives a free time-machine — the user does not need to learn git to benefit from it.
+At every review gate, the skill commits the current state of `modules/<name>/` (or `shell/` for shell-level changes) with a structured message like `G2: storyboard approved for 2.5-procurement-plan` or `G3: HTML build approved for 2.5-procurement-plan`. This gives a free time-machine — the user does not need to learn git to benefit from it.
 
 ### Pilot input for Module 2.5
 
-Seed content = the worked example already in `SKILL.md` of the storyboard skill (title, objectives, menu hub with 8 tiles, knowledge check, summary). `/content-map` expands this seed into the full O-A-P-P table during Stage 1.
+Seed content = the Module 2.5 pilot brief and any existing example artifacts (title, objectives, menu hub with 8 components, knowledge check, summary). `/content-map` expands this seed into the full O-A-P-P table during Stage 1.
 
 ---
 
@@ -218,7 +198,8 @@ Seed content = the worked example already in `SKILL.md` of the storyboard skill 
 ### Must-pass criteria (all required for MVP "done")
 
 - `/content-map` produces `modules/2.5-procurement-plan/content-map.md` with a complete 4-column O-A-P-P table that passes the quality checklist (all action verbs, no alignment gaps).
-- `/build-html` produces `content/*.md` (slide-level files) and `build/` (runnable HTML).
+- `/storyboard` produces `storyboard/storyboard.md` and, when needed, `storyboard.pptx` with screen flow, canonical layouts, interaction states, voiceover, and developer notes.
+- `/build-html` produces `content/*.md` (production slide files) and `build/` (runnable HTML) from the approved storyboard.
 - Double-clicking `build/index.html` walks the full module start-to-finish in the browser.
 - All **6 MVP layouts** render correctly:
   - **L01** (text only)
@@ -251,8 +232,8 @@ Seed content = the worked example already in `SKILL.md` of the storyboard skill 
 | Stage | How to verify | Time |
 |---|---|---|
 | `/content-map` | Eyeball `content-map.md` against quality checklist (action verbs, alignment, gaps) | 2–3 min |
-| `/build-html` phase 1 | Check summary table (slide count, layouts); spot-check a few `content/*.md` | 5 min |
-| `/build-html` phase 2 | Double-click `build/index.html`, walk through in browser, verify each layout + pop-up + MCQ | 10 min |
+| `/storyboard` | Check screen flow, canonical layout choices, interaction states, and PPT/prototype artifact | 5–10 min |
+| `/build-html` | Double-click `build/index.html`, walk through in browser, verify each layout + pop-up + MCQ | 10 min |
 | `/scorm-pack` | Verify `dist/` has zip; Claude runs basic self-check (zip opens, manifest XML valid, `index.html` entry exists) | 1 min |
 | End-to-end on SCORM Cloud | Upload → Launch → full walkthrough → read API log → check registration status | 10–15 min |
 
@@ -310,7 +291,7 @@ The detailed step-by-step plan will come from the `writing-plans` skill after th
 - **Phase 0 — Setup.** Create `~/Desktop/elearning-workspace/`, `git init`, download pipwerks + SCORM 1.2 XSD schemas.
 - **Phase 1 — De-risk.** Hello World SCORM package → upload → verify. `test-layouts.html` → iterate all 6 MVP layout CSS to satisfaction.
 - **Phase 2 — Shell.** Merge Phase 1 outputs. Write `app.js` render engine (switch on `layout_id`). Write L12 menu-hub state machine. Write L09 MCQ state + SCORM score hookup.
-- **Phase 3 — Three skills.** `/content-map`, `/build-html` (both phases), `/scorm-pack`. Install to `~/.claude/skills/`.
+- **Phase 3 — Four skills.** `/content-map`, `/storyboard`, `/build-html`, `/scorm-pack`. Install to `~/.claude/skills/`.
 - **Phase 4 — Pilot Module 2.5 end-to-end.** Run the pipeline. Review. Fix. Re-run. Upload to SCORM Cloud. Verify.
 - **Phase 5 — Wrap.** README for the pipeline. Final commit. Reference screenshots for each MVP layout.
 
@@ -320,17 +301,17 @@ Phase 1 is deliberately ahead of Phase 2 — the two highest-risk items get isol
 
 ## Decisions locked during brainstorm
 
-- **Pipeline shape:** three skills (not one mega-skill, not five micro-skills) separated by human review gates.
+- **Pipeline shape:** four skills separated by human review gates: instructional alignment, storyboarding, HTML implementation, SCORM packaging.
 - **Shell model:** shared shell, not per-module.
 - **Shell location:** `~/Desktop/elearning-workspace/shell/`.
 - **Skill location:** `~/.claude/skills/` (personal skills, not a plugin).
 - **LMS target:** SCORM 1.2 → SCORM Cloud only (not SCORM 2004, not a real LMS).
 - **MVP layouts:** L01, L03, L09, L12, L13, L14. Eight others deferred.
-- **Pilot module:** 2.5 Developing the procurement plan. Seed = worked example already in the storyboard skill's `SKILL.md`.
+- **Pilot module:** 2.5 Developing the procurement plan. Seed = existing Module 2.5 brief/example artifacts.
 - **Git auto-commit** at every review gate — in scope for MVP.
 - **SCORM wrapper:** pipwerks (mature, BSD-licensed).
 - **Two high-risk items front-loaded** in Phase 1: Hello World SCO, `test-layouts.html`.
-- **Four review gates** total: G1 (content-map), G2 (content/*.md), G3 (browser walkthrough), G4 (SCORM Cloud).
+- **Four review gates** total: G1 (content-map), G2 (storyboard), G3 (browser walkthrough), G4 (SCORM Cloud).
 
 ---
 
